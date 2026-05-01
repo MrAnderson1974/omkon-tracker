@@ -192,6 +192,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .btn-photo{background:rgba(186,162,144,.15);border:1px solid rgba(186,162,144,.3);color:var(--coal);padding:5px 12px;border-radius:var(--r);font-size:11px;font-weight:600;transition:background .2s;white-space:nowrap}
 .btn-photo:hover{background:rgba(186,162,144,.3)}
 .upd-row{display:flex;gap:12px;padding:6px 16px;border-top:1px solid var(--g100);font-size:10px;color:var(--steel);font-style:italic}
+.change-note-strip{display:flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(186,162,144,.13);border-top:1px solid rgba(186,162,144,.25);font-size:11px;color:var(--tan);font-style:italic}
 /* OVERLAYS / MODALS */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
 .overlay.open{display:flex}
@@ -873,12 +874,13 @@ function cardHTML(p, isArchived=false) {
   const more=photos.length>5?`<span class="ps-more">+${photos.length-5} more</span>`:'';
 
   // Final payment conditional logic
-  const finalUnlocked = p.GoodsReceived && p.DeliveryApproved && p.KS_DocReceived && p.KS_DocApproved && p.CBAM_Registered;
+  const finalUnlocked = p.GoodsReceived && p.DeliveryApproved && p.KS_DocReceived && p.KS_DocApproved && p.CBAM_Submitted && p.CBAM_Registered;
   const missing = [];
   if(!p.GoodsReceived) missing.push('Goods received');
   if(!p.DeliveryApproved) missing.push('Delivery approved');
   if(!p.KS_DocReceived) missing.push('KS doc. received');
   if(!p.KS_DocApproved) missing.push('KS doc. approved');
+  if(!p.CBAM_Submitted) missing.push('CBAM not submitted');
   if(!p.CBAM_Registered) missing.push('CBAM not verified');
   const p3Class = !finalUnlocked ? 'locked' : (p.Pay3Paid ? 'paid' : 'due');
   const p3Icon  = !finalUnlocked ? '🔒' : (p.Pay3Paid ? '✅' : '🔴');
@@ -1013,10 +1015,16 @@ function cardHTML(p, isArchived=false) {
   </div>
 
   <!-- CBAM -->
-  <div class="photo-strip" style="align-items:center;gap:12px" data-tip="${isCPH?'Toggle when CBAM_Supplier_Form is received and verified · Required to unlock final payment':'CPH Steel verifies supplier CBAM data — required before final payment is released'}">
-    <span class="ps-lbl">CBAM</span>
-    <span style="font-size:11px;color:var(--steel);flex:1">Supplier data verified (CBAM_Supplier_Form)</span>
-    ${isCPH ? tog(p.CBAM_Registered, p.CPO, 'CBAM_Registered') : `<span style="font-size:12px;font-weight:600;color:${p.CBAM_Registered?'var(--green)':'var(--steel)'}">${p.CBAM_Registered?'✅ Verified':'Pending'}</span>`}
+  <div style="border-top:1px solid var(--g100);padding:10px 16px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);margin-bottom:2px">CBAM</div>
+    <div class="pf" data-tip="${isCPH?'Read only — Omkon confirms supplier data is submitted':'Click to confirm CBAM_Supplier_Form has been sent to CPH Steel'}">
+      <span class="pfl">Data submitted (Omkon)</span>
+      ${!isCPH ? tog(p.CBAM_Submitted, p.CPO, 'CBAM_Submitted') : togRO(p.CBAM_Submitted)}
+    </div>
+    <div class="pf" data-tip="${isCPH?'Toggle when CBAM_Supplier_Form is received and verified · Required to unlock final payment':'Read only — CPH Steel verifies supplier data · Required before final payment'}">
+      <span class="pfl">Verified by CPH Steel</span>
+      ${isCPH ? tog(p.CBAM_Registered, p.CPO, 'CBAM_Registered') : togRO(p.CBAM_Registered)}
+    </div>
   </div>
 
   <!-- PHOTOS -->
@@ -1034,6 +1042,7 @@ function cardHTML(p, isArchived=false) {
     ${p.FilesBy?`<div style="width:100%;font-size:10px;color:var(--steel);font-style:italic;padding-top:2px">Files updated by: ${esc(p.FilesBy)}</div>`:''}
   </div>
 
+  ${p.ChangeNote?`<div class="change-note-strip">📋 ${esc(p.ChangeNote)}</div>`:''}
   <div class="upd-row">
     <span>Opdateret ${fmtD(p.Updated)}</span>
     ${p.UpdatedBy?`<span>af ${esc(p.UpdatedBy)}</span>`:''}
@@ -1304,9 +1313,23 @@ function doUnarchive(cpo) {
 }
 
 // TOGGLE
+const CHANGE_NOTE_FIELDS = {
+  CBAM_Submitted:   'CBAM data submitted (Omkon)',
+  CBAM_Registered:  'CBAM verified (CPH Steel)',
+  KS_DocReceived:   'KS doc. received',
+  KS_DocApproved:   'KS doc. approved',
+  GoodsReceived:    'Goods received',
+  DeliveryApproved: 'Delivery approved',
+  PickupConfirmed:  'Pickup confirmed',
+};
 function doToggle(cpo, field) {
   const p=findP(cpo); if(!p) return;
   p[field]=!p[field]; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
+  if(CHANGE_NOTE_FIELDS[field]) {
+    const who = ST.userName || (ST.role==='cphsteel'?'CPH Steel':'Omkon');
+    const d = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    p.ChangeNote = CHANGE_NOTE_FIELDS[field]+': '+(p[field]?'✅ Yes':'🔴 No')+' · '+who+' · '+d;
+  }
   postRow(p); renderAll();
   const label = field.replace(/([A-Z])/g,' $1').trim();
   toast(label+': '+(p[field]?'Yes ✅':'No 🔴'), p[field]?'success':'warning');
