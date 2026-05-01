@@ -174,14 +174,20 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .cbam-val{font-size:12px;font-weight:600;color:var(--coal)}
 .cbam-co2{font-size:13px;font-weight:700;color:var(--omk);font-family:'Courier New',monospace}
 /* NOTES */
-.notes-row{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--g200)}
-.note-blk{padding:12px 16px;border-right:1px solid var(--g200)}
-.note-blk:last-child{border-right:none}
-.note-lbl{font-family:var(--fh);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);margin-bottom:6px}
-.note-txt{font-size:12px;line-height:1.6;color:var(--coal);cursor:pointer;border-radius:4px;padding:4px;border:1px solid transparent;min-height:40px}
-.note-txt:hover{border-color:var(--tan);background:rgba(186,162,144,.06)}
-.note-txt.empty{color:var(--steel);font-style:italic}
-.note-by{font-size:10px;color:var(--steel);margin-top:4px;font-style:italic}
+.chat-section{border-top:1px solid var(--g200)}
+.chat-lbl{font-family:var(--fh);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);padding:10px 16px 4px}
+.chat-thread{display:flex;flex-direction:column;gap:8px;padding:8px 16px;max-height:240px;overflow-y:auto}
+.chat-thread::-webkit-scrollbar{width:4px}.chat-thread::-webkit-scrollbar-thumb{background:var(--g200);border-radius:2px}
+.chat-bubble{max-width:78%;display:flex;flex-direction:column;padding:7px 11px;border-radius:12px;font-size:12px;line-height:1.5;word-break:break-word}
+.chat-bubble.cph{align-self:flex-end;background:#3B3C3D;color:#F4F0E8;border-bottom-right-radius:3px}
+.chat-bubble.omk{align-self:flex-start;background:rgba(186,162,144,.18);color:#F4F0E8;border:1px solid rgba(186,162,144,.3);border-bottom-left-radius:3px}
+.chat-meta{font-size:10px;opacity:.55;margin-bottom:3px;font-weight:600}
+.chat-input-row{display:flex;gap:8px;padding:8px 16px 12px;align-items:flex-end}
+.chat-inp{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--g200);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--cream);font-family:var(--fb);resize:none;min-height:36px;max-height:90px}
+.chat-inp:focus{outline:none;border-color:var(--tan)}
+.chat-send{padding:8px 16px;background:var(--tan);color:#1a1a1a;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:.04em;flex-shrink:0}
+.chat-send:hover{opacity:.88}
+.chat-empty{font-size:11px;color:var(--steel);font-style:italic;padding:4px 0}
 /* PHOTOS / DOCS */
 .photo-strip{display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--g200);flex-wrap:wrap}
 .ps-lbl{font-family:var(--fh);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);white-space:nowrap}
@@ -432,7 +438,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
       <form id="form-create" onsubmit="submitCreate(event)">
         <div class="fgrid">
           <div class="fsec">Project Info</div>
-          <div class="fg s2"><label>PO / Order No. *</label><input name="po_number" required placeholder="e.g. 25115-6 or PO-2026-001"/></div>
+          <div class="fg s2"><label>Sags nr. *</label><input name="po_number" required placeholder="e.g. 25115-6"/></div>
           <div class="fg"><label>Project Name *</label><input name="name" required placeholder="e.g. Facade Phase 2"/></div>
           <div class="fg"><label>Responsible *</label><input name="responsible" required placeholder="Full name"/></div>
           <div class="fg"><label>Email</label><input type="email" name="email" placeholder="name@company.com"/></div>
@@ -459,9 +465,8 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
             <label>Initial progress: <span id="cpct">0%</span></label>
             <input type="range" name="pct" min="0" max="100" value="0" oninput="document.getElementById('cpct').textContent=this.value+'%'" style="accent-color:var(--tan);width:100%"/>
           </div>
-          <div class="fsec">Notes</div>
-          <div class="fg s2"><label>Omkon Notes</label><textarea name="omkon_notes"></textarea></div>
-          <div class="fg s2"><label>CPH Steel Notes</label><textarea name="cph_notes"></textarea></div>
+          <div class="fsec">Opening message (optional)</div>
+          <div class="fg s2"><label>Initial message</label><textarea name="initial_note" placeholder="Add an opening note visible to both parties…"></textarea></div>
         </div>
       </form>
     </div>
@@ -906,7 +911,7 @@ function cardHTML(p, isArchived=false) {
       <div class="pcs-title">Timeline &amp; Contract</div>
       <div class="pf"><span class="pfl">Project start</span>
         <span class="pfv ${p.Pay1Date?'conf':'muted'} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Sets down payment due date':'Project start = down payment due date'}">${fmtD(p.Pay1Date)||'—'}</span></div>
-      <div class="pf"><span class="pfl">PO / Ordre nr.</span>
+      <div class="pf"><span class="pfl">Sags nr.</span>
         <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="PONumber" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Customer purchase order reference':'Customer purchase order reference'}">${esc(p.PONumber)||'—'}</span></div>
       <div class="pf"><span class="pfl">Shipping / deadline</span>
         <span class="pfv ${dc} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Deadline" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Drives year grouping and health status':'Delivery deadline'}">${fmtD(p.Deadline)||'—'}</span></div>
@@ -1000,17 +1005,14 @@ function cardHTML(p, isArchived=false) {
 
   </div><!-- /pc-body -->
 
-  <!-- NOTES -->
-  <div class="notes-row">
-    <div class="note-blk">
-      <div class="note-lbl" data-tip="Both roles can add notes here · Visible to both parties">Omkon Notes</div>
-      <div class="note-txt ed ${p.OmkonNotes?'':'empty'}" data-cpo="${esc(p.CPO)}" data-f="OmkonNotes" data-t="textarea">${esc(p.OmkonNotes)||'Click to add…'}</div>
-      ${p.OmkonNotesBy?`<div class="note-by">Last edited: ${esc(p.OmkonNotesBy)}</div>`:''}
-    </div>
-    <div class="note-blk">
-      <div class="note-lbl" data-tip="${isCPH?'Click to edit · Internal notes — not visible to Omkon':'Internal CPH Steel notes — read only for Omkon'}">CPH Steel Notes</div>
-      <div class="note-txt ${isCPH?'ed':''} ${p.CPHNotes?'':'empty'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="CPHNotes" data-t="textarea"':''}>${esc(p.CPHNotes)||'Click to add…'}</div>
-      ${p.CPHNotesBy?`<div class="note-by">Last edited: ${esc(p.CPHNotesBy)}</div>`:''}
+  <!-- NOTES CHAT -->
+  <div class="chat-section">
+    <div class="chat-lbl" data-tip="Messages are visible to both CPH Steel and Omkon · CPH Steel = right (dark) · Omkon = left (tan)">Messages</div>
+    <div class="chat-thread" data-cpo="${esc(p.CPO)}">${renderNotesBubbles(p)}</div>
+    <div class="chat-input-row">
+      <textarea class="chat-inp" data-cpo="${esc(p.CPO)}" placeholder="Write a message… (Enter to send, Shift+Enter for new line)" rows="2"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();postNote('${esc(p.CPO)}');}"></textarea>
+      <button class="chat-send" onclick="postNote('${esc(p.CPO)}')">Send</button>
     </div>
   </div>
 
@@ -1393,10 +1395,10 @@ function submitCreate(e) {
     GoodsReceived:false, DeliveryApproved:false, DeliveryRemarks:'',
     Deadline:g('deadline'), Pickup:g('pickup'), PickupConfirmed:!!fd.get('pickup_confirmed'),
     KS_DocReceived:false, KS_DocApproved:false, KS_Remarks:'',
-    CBAM_CNCode:'', CBAM_Route:'EAF', CBAM_EmDirect:'', CBAM_EmIndirect:'', CBAM_Registered:false,
+    CBAM_Submitted:false, CBAM_Registered:false,
     Pct:g('pct')||'0',
-    OmkonNotes:g('omkon_notes'), OmkonNotesBy:g('omkon_notes')?(ST.userName||ST.role)+' · '+fmtShort():'',
-    CPHNotes:g('cph_notes'), CPHNotesBy:g('cph_notes')?(ST.userName||ST.role)+' · '+fmtShort():'',
+    Notes: g('initial_note') ? JSON.stringify([{r:ST.role,a:ST.userName||ST.role,t:g('initial_note'),ts:new Date().toISOString()}]) : '',
+    OmkonNotes:'', OmkonNotesBy:'', CPHNotes:'', CPHNotesBy:'',
     Photos:'', Files:'', Updated:now(), UpdatedBy:ST.userName||ST.role, Archived:false,
   };
   ST.projects.unshift(proj); postRow(proj); closeCreate(); renderYearTabs(); renderAll(); rebuildPersonFilter();
@@ -1575,6 +1577,36 @@ function fmtEur(n) { const v=parseFloat(n); return isNaN(v)?'':v.toLocaleString(
 function dlCls(s) { if(!s) return ''; const d=(new Date(s)-new Date())/86400000; return d<0?'overdue':d<7?'soon':''; }
 function now() { return new Date().toISOString(); }
 function fmtShort() { return new Date().toLocaleDateString('da-DK',{day:'2-digit',month:'short',year:'2-digit'}); }
+
+function parseNotes(s) { try{return JSON.parse(s)||[];}catch(e){return [];} }
+function renderNotesBubbles(p) {
+  let msgs=parseNotes(p.Notes);
+  if(!msgs.length) {
+    if(p.OmkonNotes) msgs.push({r:'omkon',a:p.OmkonNotesBy||'Omkon',t:p.OmkonNotes,ts:p.Updated||new Date().toISOString()});
+    if(p.CPHNotes)   msgs.push({r:'cphsteel',a:p.CPHNotesBy||'CPH Steel',t:p.CPHNotes,ts:p.Updated||new Date().toISOString()});
+  }
+  if(!msgs.length) return '<div class="chat-empty">No messages yet — write the first one below</div>';
+  return msgs.map(m=>{
+    const isCPH=m.r==='cphsteel';
+    let d='';
+    try{const dt=new Date(m.ts);d=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}catch(e){}
+    return `<div class="chat-bubble ${isCPH?'cph':'omk'}"><div class="chat-meta">${esc(m.a||'')}${d?' · '+d:''}</div><div>${esc(m.t).replace(/\n/g,'<br>')}</div></div>`;
+  }).join('');
+}
+function postNote(cpo) {
+  const p=findP(cpo); if(!p) return;
+  const inp=document.querySelector('.chat-inp[data-cpo="'+cpo+'"]'); if(!inp) return;
+  const txt=inp.value.trim(); if(!txt) return;
+  const msgs=parseNotes(p.Notes);
+  msgs.push({r:ST.role,a:ST.userName||ST.role,t:txt,ts:new Date().toISOString()});
+  p.Notes=JSON.stringify(msgs);
+  p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
+  const who=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
+  const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  p.ChangeNote='Note from '+who+' · '+d+': '+txt.slice(0,50)+(txt.length>50?'…':'');
+  postRow(p); inp.value=''; renderAll();
+  setTimeout(()=>{const t=document.querySelector('.chat-thread[data-cpo="'+cpo+'"]');if(t)t.scrollTop=t.scrollHeight;},60);
+}
 
 init();
 
