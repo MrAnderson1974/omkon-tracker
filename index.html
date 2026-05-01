@@ -752,7 +752,12 @@ function fetchSheet() {
         const p={Photos:''};
         hdrs.forEach((h,i)=>p[h]=row[i]??'');
         BOOL_FIELDS.forEach(f=>{p[f]=p[f]==='TRUE'||p[f]==='true'||p[f]===true;});
-        const ex=findP(p.CPO); if(ex) p.Photos=ex.Photos;
+        const ex=findP(p.CPO);
+        if(ex) {
+          p.Photos=ex.Photos;
+          // Preserve local Notes if Sheet returned empty (Apps Script lag) or chat is open for this project
+          if(ex.Notes && !p.Notes) p.Notes=ex.Notes;
+        }
         return p;
       });
       ST.projects=projects; setLastSync(true);
@@ -1612,7 +1617,7 @@ function renderChat() {
   const p=findP(ST.chatCPO); if(!p) return;
   const msgs=parseNotes(p.Notes), legacy=(p.OmkonNotes?1:0)+(p.CPHNotes?1:0);
   const cnt=msgs.length||legacy;
-  document.getElementById('chat-modal-title').textContent='💬 '+esc(p.Name)+(p.PONumber?' · '+esc(p.PONumber):'');
+  document.getElementById('chat-modal-title').textContent='💬 '+p.Name+(p.PONumber?' · '+p.PONumber:'');
   document.getElementById('chat-thread-modal').innerHTML=renderNotesBubbles(p);
   const t=document.getElementById('chat-thread-modal'); if(t) t.scrollTop=t.scrollHeight;
   const btn=document.querySelector('.btn-chat[data-cpo="'+ST.chatCPO+'"]');
@@ -1629,14 +1634,27 @@ function postNoteModal() {
   }
   const author=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
   msgs.push({r:ST.role,a:author,t:txt,ts:new Date().toISOString()});
-  p.Notes=JSON.stringify(msgs);
+  p.Notes=encodeNotes(msgs);
   p.Updated=now(); p.UpdatedBy=author;
   const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   p.ChangeNote='Note from '+author+' · '+d+': '+txt.slice(0,50)+(txt.length>50?'…':'');
   postRow(p); inp.value=''; renderChat();
 }
 
-function parseNotes(s) { try{return JSON.parse(s)||[];}catch(e){return [];} }
+const NOTE_SEP='^^^', NOTE_FLD='|||';
+function parseNotes(s) {
+  if(!s) return [];
+  try {
+    if(s.trimStart().startsWith('[')) return JSON.parse(s)||[]; // legacy JSON
+    return s.split(NOTE_SEP).filter(Boolean).map(m=>{
+      const parts=m.split(NOTE_FLD);
+      return {r:parts[0]||'',a:parts[1]||'',ts:parts[2]||'',t:parts.slice(3).join(NOTE_FLD)||''};
+    });
+  } catch(e){return [];}
+}
+function encodeNotes(msgs) {
+  return msgs.map(m=>[m.r,m.a,m.ts,(m.t||'').replace(/\^\^\^/g,'…')].join(NOTE_FLD)).join(NOTE_SEP);
+}
 function renderNotesBubbles(p) {
   let msgs=parseNotes(p.Notes);
   if(!msgs.length) {
@@ -1658,7 +1676,7 @@ function postNote(cpo) {
   const msgs=parseNotes(p.Notes);
   const author=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
   msgs.push({r:ST.role,a:author,t:txt,ts:new Date().toISOString()});
-  p.Notes=JSON.stringify(msgs);
+  p.Notes=encodeNotes(msgs);
   p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
   const who=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
   const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
