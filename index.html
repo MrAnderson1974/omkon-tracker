@@ -1679,6 +1679,7 @@ function renderNotesBubbles(p) {
     if(p.OmkonNotes) msgs.push({r:'omkon',a:p.OmkonNotesBy||'Omkon',t:p.OmkonNotes,ts:p.Updated||new Date().toISOString()});
     if(p.CPHNotes)   msgs.push({r:'cphsteel',a:p.CPHNotesBy||'CPH Steel',t:p.CPHNotes,ts:p.Updated||new Date().toISOString()});
   }
+  msgs=msgs.filter(m=>m.t && m.t.trim());
   if(!msgs.length) return '<div class="chat-empty">No messages yet — write the first one below</div>';
   return msgs.map(m=>{
     const isCPH=m.r==='cphsteel';
