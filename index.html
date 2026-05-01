@@ -532,6 +532,26 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
   </div>
 </div>
 
+<div class="overlay" id="modal-chat">
+  <div class="modal" style="max-width:520px;display:flex;flex-direction:column;height:78vh;max-height:700px">
+    <div class="modal-hd">
+      <h2 id="chat-modal-title">💬 Messages</h2>
+      <button class="btn-x" onclick="closeChat()">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
+      <div class="chat-thread" id="chat-thread-modal" style="flex:1;max-height:none;padding:16px"></div>
+    </div>
+    <div style="border-top:1px solid var(--g200);padding:10px 16px;display:flex;gap:8px;align-items:flex-end">
+      <textarea id="chat-modal-inp" class="chat-inp" placeholder="Write a message… (Enter to send, Shift+Enter for new line)" rows="2"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();postNoteModal();}"></textarea>
+      <button class="chat-send" onclick="postNoteModal()">Send</button>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-cancel" onclick="closeChat()">Luk</button>
+    </div>
+  </div>
+</div>
+
 <div id="toasts"></div>
 
 <script>
@@ -649,6 +669,7 @@ const ST = {
   lbPhotos:[], lbIdx:0,
   archiveOpen:false,
   cbamOpen: new Set(),
+  chatCPO: null,
 };
 
 function init() {
@@ -1009,15 +1030,10 @@ function cardHTML(p, isArchived=false) {
 
   </div><!-- /pc-body -->
 
-  <!-- NOTES CHAT -->
-  <div class="chat-section">
-    <div class="chat-lbl" data-tip="Messages are visible to both CPH Steel and Omkon · CPH Steel = right (dark) · Omkon = left (tan)">Messages</div>
-    <div class="chat-thread" data-cpo="${esc(p.CPO)}">${renderNotesBubbles(p)}</div>
-    <div class="chat-input-row">
-      <textarea class="chat-inp" data-cpo="${esc(p.CPO)}" placeholder="Write a message… (Enter to send, Shift+Enter for new line)" rows="2"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();postNote('${esc(p.CPO)}');}"></textarea>
-      <button class="chat-send" onclick="postNote('${esc(p.CPO)}')">Send</button>
-    </div>
+  <!-- MESSAGES BUTTON -->
+  <div class="photo-strip" style="align-items:center" data-tip="Open shared message thread — visible to both CPH Steel and Omkon">
+    <span class="ps-lbl">Messages</span>
+    <button class="btn-photo btn-chat" data-cpo="${esc(p.CPO)}" onclick="openChat('${esc(p.CPO)}')">${(()=>{const n=parseNotes(p.Notes).length||((p.OmkonNotes?1:0)+(p.CPHNotes?1:0));return '💬 '+(n?'Messages ('+n+')':'Start conversation');})()}</button>
   </div>
 
   <!-- CBAM -->
@@ -1288,6 +1304,7 @@ function bindEvents() {
     if(o.id==='modal-docs') closeDocs();
     if(o.id==='modal-create') closeCreate();
     if(o.id==='modal-cashflow') closeCashFlow();
+    if(o.id==='modal-chat') closeChat();
   }));
   document.addEventListener('keydown', e=>{
     if(e.key==='Escape') { closeLBDirect(); document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open')); cancelEdit(); }
@@ -1581,6 +1598,43 @@ function fmtEur(n) { const v=parseFloat(n); return isNaN(v)?'':v.toLocaleString(
 function dlCls(s) { if(!s) return ''; const d=(new Date(s)-new Date())/86400000; return d<0?'overdue':d<7?'soon':''; }
 function now() { return new Date().toISOString(); }
 function fmtShort() { return new Date().toLocaleDateString('da-DK',{day:'2-digit',month:'short',year:'2-digit'}); }
+
+function openChat(cpo) {
+  ST.chatCPO=cpo; renderChat();
+  document.getElementById('modal-chat').classList.add('open');
+  setTimeout(()=>{
+    const t=document.getElementById('chat-thread-modal'); if(t) t.scrollTop=t.scrollHeight;
+    document.getElementById('chat-modal-inp')?.focus();
+  },60);
+}
+function closeChat() { document.getElementById('modal-chat').classList.remove('open'); ST.chatCPO=null; }
+function renderChat() {
+  const p=findP(ST.chatCPO); if(!p) return;
+  const msgs=parseNotes(p.Notes), legacy=(p.OmkonNotes?1:0)+(p.CPHNotes?1:0);
+  const cnt=msgs.length||legacy;
+  document.getElementById('chat-modal-title').textContent='💬 '+esc(p.Name)+(p.PONumber?' · '+esc(p.PONumber):'');
+  document.getElementById('chat-thread-modal').innerHTML=renderNotesBubbles(p);
+  const t=document.getElementById('chat-thread-modal'); if(t) t.scrollTop=t.scrollHeight;
+  const btn=document.querySelector('.btn-chat[data-cpo="'+ST.chatCPO+'"]');
+  if(btn) btn.textContent='💬 '+(cnt?'Messages ('+cnt+')':'Start conversation');
+}
+function postNoteModal() {
+  const p=findP(ST.chatCPO); if(!p) return;
+  const inp=document.getElementById('chat-modal-inp'); if(!inp) return;
+  const txt=inp.value.trim(); if(!txt) return;
+  let msgs=parseNotes(p.Notes);
+  if(!msgs.length) {
+    if(p.OmkonNotes) msgs.push({r:'omkon',a:p.OmkonNotesBy||'Omkon',t:p.OmkonNotes,ts:p.Updated||new Date().toISOString()});
+    if(p.CPHNotes)   msgs.push({r:'cphsteel',a:p.CPHNotesBy||'CPH Steel',t:p.CPHNotes,ts:p.Updated||new Date().toISOString()});
+  }
+  const author=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
+  msgs.push({r:ST.role,a:author,t:txt,ts:new Date().toISOString()});
+  p.Notes=JSON.stringify(msgs);
+  p.Updated=now(); p.UpdatedBy=author;
+  const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  p.ChangeNote='Note from '+author+' · '+d+': '+txt.slice(0,50)+(txt.length>50?'…':'');
+  postRow(p); inp.value=''; renderChat();
+}
 
 function parseNotes(s) { try{return JSON.parse(s)||[];}catch(e){return [];} }
 function renderNotesBubbles(p) {
