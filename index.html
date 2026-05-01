@@ -566,7 +566,7 @@ const GAS_URL  = 'https://script.google.com/macros/s/AKfycbyVxID4TA4t5muFeeHxPx0
 const ROLE_PINS = { cphsteel: '2025', omkon: '5678' };
 const CONFIGURED = SHEET_ID !== 'YOUR_SHEET_ID_HERE' && GAS_URL !== 'YOUR_GAS_URL_HERE';
 const BOOL_FIELDS = ['Pay1Paid','Pay2Paid','Pay3Paid','GoodsReceived','DeliveryApproved',
-  'PickupConfirmed','KS_DocReceived','KS_DocApproved','Archived','CBAM_Registered'];
+  'PickupConfirmed','KS_DocReceived','KS_DocApproved','Archived','CBAM_Registered','CBAM_Submitted'];
 
 function dn(d){const dt=new Date();dt.setDate(dt.getDate()+d);return dt.toISOString().slice(0,10);}
 const DEMO = [
