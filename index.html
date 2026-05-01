@@ -1675,11 +1675,12 @@ function encodeNotes(msgs) {
 }
 function renderNotesBubbles(p) {
   let msgs=parseNotes(p.Notes);
+  const validLegacy=s=>s && !['false','true','0','1'].includes(s.trim().toLowerCase());
   if(!msgs.length) {
-    if(p.OmkonNotes) msgs.push({r:'omkon',a:p.OmkonNotesBy||'Omkon',t:p.OmkonNotes,ts:p.Updated||new Date().toISOString()});
-    if(p.CPHNotes)   msgs.push({r:'cphsteel',a:p.CPHNotesBy||'CPH Steel',t:p.CPHNotes,ts:p.Updated||new Date().toISOString()});
+    if(validLegacy(p.OmkonNotes)) msgs.push({r:'omkon',a:p.OmkonNotesBy||'Omkon',t:p.OmkonNotes,ts:p.Updated||new Date().toISOString()});
+    if(validLegacy(p.CPHNotes))   msgs.push({r:'cphsteel',a:p.CPHNotesBy||'CPH Steel',t:p.CPHNotes,ts:p.Updated||new Date().toISOString()});
   }
-  msgs=msgs.filter(m=>m.t && m.t.trim());
+  msgs=msgs.filter(m=>m.t && m.t.trim() && !['false','true'].includes(m.t.trim().toLowerCase()));
   if(!msgs.length) return '<div class="chat-empty">No messages yet — write the first one below</div>';
   return msgs.map(m=>{
     const isCPH=m.r==='cphsteel';
