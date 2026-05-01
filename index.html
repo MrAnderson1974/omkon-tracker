@@ -903,36 +903,36 @@ function cardHTML(p, isArchived=false) {
     <div class="pcs">
       <div class="pcs-title">Timeline &amp; Contract</div>
       <div class="pf"><span class="pfl">Project start</span>
-        <span class="pfv ${p.Pay1Date?'conf':'muted'} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''} data-tip="Project start = Down payment date">${fmtD(p.Pay1Date)||'—'}</span></div>
+        <span class="pfv ${p.Pay1Date?'conf':'muted'} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Sets down payment due date':'Project start = down payment due date'}">${fmtD(p.Pay1Date)||'—'}</span></div>
       <div class="pf"><span class="pfl">PO / Ordre nr.</span>
-        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="PONumber" data-t="text"`:''} >${esc(p.PONumber)||'—'}</span></div>
+        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="PONumber" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Customer purchase order reference':'Customer purchase order reference'}">${esc(p.PONumber)||'—'}</span></div>
       <div class="pf"><span class="pfl">Shipping / deadline</span>
-        <span class="pfv ${dc} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Deadline" data-t="date"`:''} >${fmtD(p.Deadline)||'—'}</span></div>
+        <span class="pfv ${dc} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Deadline" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Drives year grouping and health status':'Delivery deadline'}">${fmtD(p.Deadline)||'—'}</span></div>
       <div class="pf"><span class="pfl">Pickup date</span>
-        <span class="pfv ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pickup" data-t="date"`:''} >${fmtD(p.Pickup)||'—'}</span></div>
-      <div class="pf"><span class="pfl">Pickup confirmed</span>
+        <span class="pfv ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pickup" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Sets 2nd payment due date + est. final date':'Pickup date — sets 2nd payment due date'}">${fmtD(p.Pickup)||'—'}</span></div>
+      <div class="pf" data-tip="${isCPH?'Toggle when Omkon confirms pickup is ready':'Read only — set by CPH Steel'}"><span class="pfl">Pickup confirmed</span>
         ${isCPH?tog(p.PickupConfirmed, p.CPO, 'PickupConfirmed'):togRO(p.PickupConfirmed)}</div>
       <div style="border-top:1px dashed var(--g200);margin:8px 0"></div>
       <div class="pf"><span class="pfl">Responsible</span>
-        <span class="pfv ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Responsible" data-t="text"`:''} >${esc(p.Responsible)}</span></div>
+        <span class="pfv ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Responsible" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Omkon contact person':'Project contact at Omkon'}">${esc(p.Responsible)}</span></div>
       <div class="pf"><span class="pfl">Email</span>
-        <span class="pfv muted ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Email" data-t="text"`:''} >${p.Email?`<a href="mailto:${esc(p.Email)}" style="color:inherit;text-decoration:underline" onclick="event.stopPropagation()">${esc(p.Email)}</a>`:'—'}</span></div>
+        <span class="pfv muted ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Email" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Click address to open mail client':'Click address to send email'}">${p.Email?`<a href="mailto:${esc(p.Email)}" style="color:inherit;text-decoration:underline" onclick="event.stopPropagation()">${esc(p.Email)}</a>`:'—'}</span></div>
       <div class="pf"><span class="pfl">Phone</span>
-        <span class="pfv muted ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Phone" data-t="text"`:''} >${esc(p.Phone)||'—'}</span></div>
+        <span class="pfv muted ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Phone" data-t="text"`:''} data-tip="${isCPH?'Click to edit':'Contact phone number'}">${esc(p.Phone)||'—'}</span></div>
     </div>
 
     <!-- 2: PRICING & PROGRESS -->
     <div class="pcs">
       <div class="pcs-title">Pricing &amp; Progress</div>
       <div class="pf"><span class="pfl">Total</span>
-        <span class="pfv eur ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Total" data-t="number"`:''} data-tip="${isCPH?'Click to edit':'Only CPH Steel can edit price'}">€ ${fmtEur(total)||'—'}</span></div>
+        <span class="pfv eur ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Total" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Contract value ex. VAT':'Contract value — set by CPH Steel'}">€ ${fmtEur(total)||'—'}</span></div>
       <div class="pf"><span class="pfl">Quantity (kg)</span>
-        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Qty" data-t="number"`:''} >${fmt(p.Qty)||'—'}</span></div>
+        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Qty" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Weight of steel delivered':'Total steel weight in kg'}">${fmt(p.Qty)||'—'}</span></div>
       <div class="pf"><span class="pfl">Price / kg</span>
-        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Price" data-t="number"`:''} data-tip="${isCPH?'Click to edit':'Only CPH Steel can edit'}">€ ${p.Price?fmtEur(p.Price):'—'}</span></div>
+        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Price" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Unit price per kg':'Unit price per kg — set by CPH Steel'}">€ ${p.Price?fmtEur(p.Price):'—'}</span></div>
       <div style="margin-top:12px">
         <div class="prog-row">
-          <span class="pfl">Production progress</span>
+          <span class="pfl" data-tip="${isCPH?'Drag slider to update':'Omkon updates production progress'}">Production progress</span>
           <span class="prog-pct" data-cpo="${esc(p.CPO)}">${pct}%</span>
         </div>
         <div class="prog-bar"><div class="prog-fill ${pc}" style="width:${pct}%" data-cpo="${esc(p.CPO)}"></div></div>
@@ -951,17 +951,17 @@ function cardHTML(p, isArchived=false) {
       </div>
       <div class="pay-date-row">
         <span class="pay-date-label">Project start:</span>
-        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pay1Date" data-t="date"':''}>${fmtD(p.Pay1Date)||'Date not set'}</span>
+        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pay1Date" data-t="date"':''} data-tip="${isCPH?'Click to edit · Down payment due date':'Down payment due date'}">${fmtD(p.Pay1Date)||'Date not set'}</span>
       </div>
 
-      <div class="pay-pill ${p.Pay2Paid?'paid':'due'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-pay="Pay2Paid" data-tip="Click to mark as paid / unpaid"':''} style="${isCPH?'':'cursor:default'}">
+      <div class="pay-pill ${p.Pay2Paid?'paid':'due'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-pay="Pay2Paid" data-tip="Click to mark as paid / unpaid"':'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
         <span class="pi">${p.Pay2Paid?'✅':'🔴'}</span>
         <span class="plabel">2nd payment (50%)</span>
         <span class="pamt">€ ${fmtEur(total*.50)}</span>
       </div>
       <div class="pay-date-row">
         <span class="pay-date-label">Pick up:</span>
-        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pickup" data-t="date"':''}>${fmtD(p.Pickup)||'Date not set'}</span>
+        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pickup" data-t="date"':''} data-tip="${isCPH?'Click to edit · 2nd payment due at pickup':'2nd payment is due at pickup date'}">${fmtD(p.Pickup)||'Date not set'}</span>
       </div>
 
       <div class="pay-pill ${p3Class}" ${p3Click}>
@@ -971,7 +971,7 @@ function cardHTML(p, isArchived=false) {
       </div>
       <div class="pay-date-row">
         <span class="pay-date-label">Shipping:</span>
-        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pay3Date" data-t="date"':''}>${cleanDate(p.Pay3Date)?fmtD(p.Pay3Date):(p.Pickup?fmtD(addDays(p.Pickup,30))+' <span style="opacity:.6;font-size:10px">(est.)</span>':'Date not set')}</span>
+        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pay3Date" data-t="date"':''} data-tip="${isCPH?'Click to set confirmed date · Default = Pickup + 30 days':'Final payment date · Default = Pickup + 30 days'}">${cleanDate(p.Pay3Date)?fmtD(p.Pay3Date):(p.Pickup?fmtD(addDays(p.Pickup,30))+' <span style="opacity:.6;font-size:10px">(est.)</span>':'Date not set')}</span>
       </div>
       ${!finalUnlocked && missing.length ? `<div class="pay-lock-info">🔒 Pending: ${missing.join(' · ')}</div>` : ''}
       ${finalUnlocked && !p.Pay3Paid ? `<div style="font-size:10px;color:var(--green);padding:2px 4px 6px">✅ All conditions met — payment can be released</div>` : ''}
@@ -981,18 +981,18 @@ function cardHTML(p, isArchived=false) {
     <div class="pcs">
       <div class="pcs-title">KS &amp; Delivery</div>
       <div class="pf"><span class="pfl">KS Tags</span>
-        <span class="pfv ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="KS_Tags" data-t="text"':''}>${esc(p.KS_Tags)||'—'}</span></div>
+        <span class="pfv ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="KS_Tags" data-t="text"':''} data-tip="${isCPH?'Click to edit · Internal QA reference tags':'Internal QA reference tags'}">${esc(p.KS_Tags)||'—'}</span></div>
       <div style="margin-top:8px">
-        <div class="pf"><span class="pfl">KS doc. received</span>${isCPH?tog(p.KS_DocReceived, p.CPO, 'KS_DocReceived'):togRO(p.KS_DocReceived)}</div>
-        <div class="pf"><span class="pfl">KS doc. approved</span>${isCPH?tog(p.KS_DocApproved, p.CPO, 'KS_DocApproved'):togRO(p.KS_DocApproved)}</div>
-        <div class="pfl" style="margin-top:6px;margin-bottom:3px">KS Remarks</div>
+        <div class="pf" data-tip="${isCPH?'Toggle when KS documentation is received from Omkon':'Read only — set by CPH Steel'}"><span class="pfl">KS doc. received</span>${isCPH?tog(p.KS_DocReceived, p.CPO, 'KS_DocReceived'):togRO(p.KS_DocReceived)}</div>
+        <div class="pf" data-tip="${isCPH?'Toggle when KS documentation is approved internally':'Read only — set by CPH Steel'}"><span class="pfl">KS doc. approved</span>${isCPH?tog(p.KS_DocApproved, p.CPO, 'KS_DocApproved'):togRO(p.KS_DocApproved)}</div>
+        <div class="pfl" style="margin-top:6px;margin-bottom:3px" data-tip="${isCPH?'Click to add/edit QA remarks':'Read only — set by CPH Steel'}">KS Remarks</div>
         <div class="rem-area ${isCPH?'ed':''} ${p.KS_Remarks?'':'empty'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="KS_Remarks" data-t="textarea"':''}>${esc(p.KS_Remarks)||'No remarks…'}</div>
       </div>
       <hr class="ks-divider"/>
       <div class="ks-sub-title">After Delivery</div>
-      <div class="pf"><span class="pfl">Goods received</span>${isCPH?tog(p.GoodsReceived, p.CPO, 'GoodsReceived'):togRO(p.GoodsReceived)}</div>
-      <div class="pf"><span class="pfl">Delivery approved</span>${isCPH?tog(p.DeliveryApproved, p.CPO, 'DeliveryApproved'):togRO(p.DeliveryApproved)}</div>
-      <div class="pfl" style="margin-top:6px;margin-bottom:3px">Delivery remarks</div>
+      <div class="pf" data-tip="${isCPH?'Toggle when goods are physically received at CPH Steel':'Read only — set by CPH Steel'}"><span class="pfl">Goods received</span>${isCPH?tog(p.GoodsReceived, p.CPO, 'GoodsReceived'):togRO(p.GoodsReceived)}</div>
+      <div class="pf" data-tip="${isCPH?'Toggle when delivery is formally approved':'Read only — set by CPH Steel'}"><span class="pfl">Delivery approved</span>${isCPH?tog(p.DeliveryApproved, p.CPO, 'DeliveryApproved'):togRO(p.DeliveryApproved)}</div>
+      <div class="pfl" style="margin-top:6px;margin-bottom:3px" data-tip="${isCPH?'Click to add/edit delivery remarks':'Read only — set by CPH Steel'}">Delivery remarks</div>
       <div class="rem-area ${isCPH?'ed':''} ${p.DeliveryRemarks?'':'empty'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="DeliveryRemarks" data-t="textarea"':''}>${esc(p.DeliveryRemarks)||'No remarks…'}</div>
     </div>
 
@@ -1001,19 +1001,19 @@ function cardHTML(p, isArchived=false) {
   <!-- NOTES -->
   <div class="notes-row">
     <div class="note-blk">
-      <div class="note-lbl">Omkon Notes</div>
+      <div class="note-lbl" data-tip="Both roles can add notes here · Visible to both parties">Omkon Notes</div>
       <div class="note-txt ed ${p.OmkonNotes?'':'empty'}" data-cpo="${esc(p.CPO)}" data-f="OmkonNotes" data-t="textarea">${esc(p.OmkonNotes)||'Click to add…'}</div>
       ${p.OmkonNotesBy?`<div class="note-by">Last edited: ${esc(p.OmkonNotesBy)}</div>`:''}
     </div>
     <div class="note-blk">
-      <div class="note-lbl">CPH Steel Notes</div>
+      <div class="note-lbl" data-tip="${isCPH?'Click to edit · Internal notes — not visible to Omkon':'Internal CPH Steel notes — read only for Omkon'}">CPH Steel Notes</div>
       <div class="note-txt ${isCPH?'ed':''} ${p.CPHNotes?'':'empty'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="CPHNotes" data-t="textarea"':''}>${esc(p.CPHNotes)||'Click to add…'}</div>
       ${p.CPHNotesBy?`<div class="note-by">Last edited: ${esc(p.CPHNotesBy)}</div>`:''}
     </div>
   </div>
 
   <!-- CBAM -->
-  <div class="photo-strip" style="align-items:center;gap:12px">
+  <div class="photo-strip" style="align-items:center;gap:12px" data-tip="${isCPH?'Toggle when CBAM_Supplier_Form is received and verified · Required to unlock final payment':'CPH Steel verifies supplier CBAM data — required before final payment is released'}">
     <span class="ps-lbl">CBAM</span>
     <span style="font-size:11px;color:var(--steel);flex:1">Supplier data verified (CBAM_Supplier_Form)</span>
     ${isCPH ? tog(p.CBAM_Registered, p.CPO, 'CBAM_Registered') : `<span style="font-size:12px;font-weight:600;color:${p.CBAM_Registered?'var(--green)':'var(--steel)'}">${p.CBAM_Registered?'✅ Verified':'Pending'}</span>`}
