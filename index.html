@@ -183,8 +183,9 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .chat-bubble.omk{align-self:flex-start;background:rgba(186,162,144,.18);color:#F4F0E8;border:1px solid rgba(186,162,144,.3);border-bottom-left-radius:3px}
 .chat-meta{font-size:10px;opacity:.55;margin-bottom:3px;font-weight:600}
 .chat-input-row{display:flex;gap:8px;padding:8px 16px 12px;align-items:flex-end}
-.chat-inp{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--g200);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--cream);font-family:var(--fb);resize:none;min-height:36px;max-height:90px}
-.chat-inp:focus{outline:none;border-color:var(--tan)}
+.chat-inp{flex:1;background:#fff;border:1px solid #ccc;border-radius:8px;padding:7px 10px;font-size:13px;color:#1a1a1a;font-family:var(--fb);resize:none;min-height:36px;max-height:90px}
+.chat-inp:focus{outline:none;border-color:var(--tan);background:#fff}
+.chat-inp::placeholder{color:#999}
 .chat-send{padding:8px 16px;background:var(--tan);color:#1a1a1a;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:.04em;flex-shrink:0}
 .chat-send:hover{opacity:.88}
 .chat-empty{font-size:11px;color:var(--steel);font-style:italic;padding:4px 0}
@@ -881,7 +882,7 @@ function calcStats() {
   const fT=n=>n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
   const yrLabel = yr==='all' ? 'All years' : yr;
   document.getElementById('st-yr-label').textContent = yrLabel;
-  document.getElementById('st-tons').textContent=(tons/1000).toLocaleString('en-GB',{minimumFractionDigits:1,maximumFractionDigits:1})+' t';
+  document.getElementById('st-tons').textContent=Math.round(tons/1000).toLocaleString('da-DK')+' t';
   document.getElementById('st-eur').textContent='€ '+fT(eur);
   document.getElementById('st-paid').textContent='€ '+fT(paid);
   document.getElementById('st-due').textContent='€ '+fT(eur-paid);
@@ -1226,19 +1227,30 @@ function exportExcel() {
     if(p.Pay2Paid) sumPaid+=p2; else { sumOutstanding+=p2; if(d2&&new Date(d2)<todayD) sumOverdue+=p2; }
     if(p.Pay3Paid) sumPaid+=p3; else { sumOutstanding+=p3; if(!fu) sumFinal+=p3; else if(d3&&new Date(d3)<todayD) sumOverdue+=p3; }
   });
+  // Summary block — cols A+B only
   cfRows.push([]);
-  cfRows.push(['SUMMARY','','','','','Amount (EUR)','','','','']);
-  cfRows.push(['Paid','','','','',+sumPaid.toFixed(2),'','','','']);
-  cfRows.push(['Overdue today','','','','',+sumOverdue.toFixed(2),'','','','']);
-  cfRows.push(['Outstanding (unpaid)','','','','',+sumOutstanding.toFixed(2),'','','','']);
-  cfRows.push(['Final — conditional (locked)','','','','',+sumFinal.toFixed(2),'','','','']);
-  cfRows.push(['Open positions','','','','',openPos,'','','','']);
+  cfRows.push(['SUMMARY','EUR']);
+  cfRows.push(['✅ Paid',+sumPaid.toFixed(2)]);
+  cfRows.push(['⚠️ Overdue today',+sumOverdue.toFixed(2)]);
+  cfRows.push(['📋 Outstanding (unpaid)',+sumOutstanding.toFixed(2)]);
+  cfRows.push(['🔒 Final — conditional',+sumFinal.toFixed(2)]);
+  cfRows.push(['Open positions',openPos]);
 
   const wsCF = XLSX.utils.aoa_to_sheet(cfRows);
-  wsCF['!cols'] = [{wch:28},{wch:16},{wch:28},{wch:16},{wch:22},{wch:14},{wch:12},{wch:6},{wch:6},{wch:14}];
+  wsCF['!cols'] = [{wch:30},{wch:16},{wch:28},{wch:16},{wch:22},{wch:14},{wch:12},{wch:6},{wch:6},{wch:14}];
+
+  // Apply € number format to Amount column (col F = index 5) and summary col B
+  const eurFmt = '#,##0.00';
+  const cfRange = XLSX.utils.decode_range(wsCF['!ref']);
+  for(let r=1; r<=cfRange.e.r; r++) {
+    const addr=XLSX.utils.encode_cell({r,c:5});
+    if(wsCF[addr] && typeof wsCF[addr].v==='number') wsCF[addr].z=eurFmt;
+    const addr2=XLSX.utils.encode_cell({r,c:1});
+    if(wsCF[addr2] && typeof wsCF[addr2].v==='number') wsCF[addr2].z=eurFmt;
+  }
 
   // Sheet 2: Projects overview
-  const prHeaders = ['CPO','PO / Order No.','Project','Responsible','Deadline','Pickup','Total (EUR)','Qty (kg)','Progress %','Pay 1','Pay 2','Pay 3','Goods rcv.','Delivery appr.','KS doc rcv.','KS doc appr.','CBAM verified'];
+  const prHeaders = ['CPO','Sags nr.','Project','Responsible','Deadline','Pickup','Total (EUR)','Qty (kg)','Progress %','Pay 1','Pay 2','Pay 3','Goods rcv.','Delivery appr.','KS doc rcv.','KS doc appr.','CBAM submitted','CBAM verified'];
   const prRows = [prHeaders];
   open.forEach(p=>{
     prRows.push([
@@ -1250,11 +1262,17 @@ function exportExcel() {
       p.Pay1Paid?'Yes':'No', p.Pay2Paid?'Yes':'No', p.Pay3Paid?'Yes':'No',
       p.GoodsReceived?'Yes':'No', p.DeliveryApproved?'Yes':'No',
       p.KS_DocReceived?'Yes':'No', p.KS_DocApproved?'Yes':'No',
-      p.CBAM_Registered?'Yes':'No'
+      p.CBAM_Submitted?'Yes':'No', p.CBAM_Registered?'Yes':'No'
     ]);
   });
   const wsPR = XLSX.utils.aoa_to_sheet(prRows);
-  wsPR['!cols'] = [{wch:14},{wch:16},{wch:28},{wch:16},{wch:12},{wch:12},{wch:13},{wch:10},{wch:10},{wch:7},{wch:7},{wch:7},{wch:11},{wch:14},{wch:12},{wch:12},{wch:14}];
+  wsPR['!cols'] = [{wch:14},{wch:14},{wch:28},{wch:16},{wch:12},{wch:12},{wch:13},{wch:10},{wch:10},{wch:7},{wch:7},{wch:7},{wch:11},{wch:14},{wch:12},{wch:12},{wch:14},{wch:14}];
+  // € format on Total column (col G = index 6)
+  const prRange = XLSX.utils.decode_range(wsPR['!ref']);
+  for(let r=1; r<=prRange.e.r; r++) {
+    const addr=XLSX.utils.encode_cell({r,c:6});
+    if(wsPR[addr] && typeof wsPR[addr].v==='number') wsPR[addr].z=eurFmt;
+  }
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, wsCF, 'Cash Flow');
