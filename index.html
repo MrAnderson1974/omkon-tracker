@@ -181,6 +181,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .chat-bubble{max-width:78%;display:flex;flex-direction:column;padding:7px 11px;border-radius:12px;font-size:12px;line-height:1.5;word-break:break-word}
 .chat-bubble.cph{align-self:flex-end;background:#3B3C3D;color:#F4F0E8;border-bottom-right-radius:3px}
 .chat-bubble.omk{align-self:flex-start;background:rgba(186,162,144,.18);color:var(--coal);border:1px solid rgba(186,162,144,.3);border-bottom-left-radius:3px}
+.chat-bubble.sys{align-self:center;background:transparent;color:var(--steel);font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--g200);max-width:92%;text-align:center;font-style:italic}
 .chat-meta{font-size:10px;opacity:.55;margin-bottom:3px;font-weight:600}
 .chat-input-row{display:flex;gap:8px;padding:8px 16px 12px;align-items:flex-end}
 .chat-inp{flex:1;background:#fff;border:1px solid #ccc;border-radius:8px;padding:7px 10px;font-size:13px;color:#1a1a1a;font-family:var(--fb);resize:none;min-height:36px;max-height:90px}
@@ -1037,7 +1038,7 @@ function cardHTML(p, isArchived=false) {
   <!-- MESSAGES BUTTON -->
   <div class="photo-strip" style="align-items:center" data-tip="Open shared message thread — visible to both CPH Steel and Omkon">
     <span class="ps-lbl">Messages</span>
-    <button class="btn-photo btn-chat" data-cpo="${esc(p.CPO)}" onclick="openChat('${esc(p.CPO)}')">${(()=>{const n=parseNotes(p.Notes).length||((p.OmkonNotes?1:0)+(p.CPHNotes?1:0));return '💬 '+(n?'Messages ('+n+')':'Start conversation');})()}</button>
+    <button class="btn-photo btn-chat" data-cpo="${esc(p.CPO)}" onclick="openChat('${esc(p.CPO)}')">${(()=>{const bad=['false','true'];const vl=s=>s&&!bad.includes(s.trim().toLowerCase());const n=parseNotes(p.Notes).filter(m=>m.t&&m.t.trim()&&!bad.includes(m.t.trim().toLowerCase())).length||(vl(p.OmkonNotes)?1:0)+(vl(p.CPHNotes)?1:0);return '💬 '+(n?'Messages ('+n+')':'Start conversation');})()}</button>
   </div>
 
   <!-- CBAM -->
@@ -1372,7 +1373,11 @@ function doToggle(cpo, field) {
   if(CHANGE_NOTE_FIELDS[field]) {
     const who = ST.userName || (ST.role==='cphsteel'?'CPH Steel':'Omkon');
     const d = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-    p.ChangeNote = CHANGE_NOTE_FIELDS[field]+': '+(p[field]?'✅ Yes':'🔴 No')+' · '+who+' · '+d;
+    const sysTxt = CHANGE_NOTE_FIELDS[field]+': '+(p[field]?'✅ Yes':'🔴 No')+' · '+who+' · '+d;
+    p.ChangeNote = sysTxt;
+    const msgs = parseNotes(p.Notes);
+    msgs.push({r:'system',a:'',ts:new Date().toISOString(),t:sysTxt});
+    p.Notes = encodeNotes(msgs);
   }
   postRow(p); renderAll();
   const label = field.replace(/([A-Z])/g,' $1').trim();
@@ -1683,6 +1688,7 @@ function renderNotesBubbles(p) {
   msgs=msgs.filter(m=>m.t && m.t.trim() && !['false','true'].includes(m.t.trim().toLowerCase()));
   if(!msgs.length) return '<div class="chat-empty">No messages yet — write the first one below</div>';
   return msgs.map(m=>{
+    if(m.r==='system') return `<div class="chat-bubble sys">${esc(m.t)}</div>`;
     const isCPH=m.r==='cphsteel';
     let d='';
     try{const dt=new Date(m.ts);d=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}catch(e){}
