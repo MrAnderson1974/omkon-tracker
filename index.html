@@ -1178,8 +1178,28 @@ function exportExcel() {
     cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'2nd payment (50%)',+(t*.50).toFixed(2),d2,'No',p.Pay2Paid?'Yes':'No','']);
     cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'Final payment (20%)',+(t*.20).toFixed(2),d3,!cleanDate(p.Pay3Date)&&!!d3?'Yes':'No',p.Pay3Paid?'Yes':'No',fu?'Yes':'No']);
   });
+  // Summary block
+  const todayD = new Date(); todayD.setHours(0,0,0,0);
+  let sumPaid=0, sumOverdue=0, sumOutstanding=0, sumFinal=0, openPos=open.length;
+  open.forEach(p=>{
+    const t=parseFloat(p.Total)||0;
+    const fu=p.GoodsReceived&&p.DeliveryApproved&&p.KS_DocReceived&&p.KS_DocApproved&&p.CBAM_Registered;
+    const p1=+(t*.30).toFixed(2), p2=+(t*.50).toFixed(2), p3=+(t*.20).toFixed(2);
+    const d1=cleanDate(p.Pay1Date), d2=cleanDate(p.Pickup), d3=finalDate(p)||'';
+    if(p.Pay1Paid) sumPaid+=p1; else { sumOutstanding+=p1; if(d1&&new Date(d1)<todayD) sumOverdue+=p1; }
+    if(p.Pay2Paid) sumPaid+=p2; else { sumOutstanding+=p2; if(d2&&new Date(d2)<todayD) sumOverdue+=p2; }
+    if(p.Pay3Paid) sumPaid+=p3; else { sumOutstanding+=p3; if(!fu) sumFinal+=p3; else if(d3&&new Date(d3)<todayD) sumOverdue+=p3; }
+  });
+  cfRows.push([]);
+  cfRows.push(['SUMMARY','','','','','Amount (EUR)','','','','']);
+  cfRows.push(['Paid','','','','',+sumPaid.toFixed(2),'','','','']);
+  cfRows.push(['Overdue today','','','','',+sumOverdue.toFixed(2),'','','','']);
+  cfRows.push(['Outstanding (unpaid)','','','','',+sumOutstanding.toFixed(2),'','','','']);
+  cfRows.push(['Final — conditional (locked)','','','','',+sumFinal.toFixed(2),'','','','']);
+  cfRows.push(['Open positions','','','','',openPos,'','','','']);
+
   const wsCF = XLSX.utils.aoa_to_sheet(cfRows);
-  wsCF['!cols'] = [{wch:14},{wch:16},{wch:28},{wch:16},{wch:22},{wch:14},{wch:12},{wch:6},{wch:6},{wch:14}];
+  wsCF['!cols'] = [{wch:28},{wch:16},{wch:28},{wch:16},{wch:22},{wch:14},{wch:12},{wch:6},{wch:6},{wch:14}];
 
   // Sheet 2: Projects overview
   const prHeaders = ['CPO','PO / Order No.','Project','Responsible','Deadline','Pickup','Total (EUR)','Qty (kg)','Progress %','Pay 1','Pay 2','Pay 3','Goods rcv.','Delivery appr.','KS doc rcv.','KS doc appr.','CBAM verified'];
@@ -1521,7 +1541,7 @@ function validDate(s) {
   const yr=parseInt(s.slice(0,4)); if(yr<2020||yr>2040) return false;
   return !isNaN(new Date(s));
 }
-function cleanDate(s) { return validDate(s)?s:''; }
+function cleanDate(s) { return validDate(s)?s.slice(0,10):''; }
 function finalDate(p) {
   const pd = cleanDate(p.Pay3Date);
   const ref = cleanDate(p.Pickup)||cleanDate(p.Pay2Date)||cleanDate(p.Deadline);
