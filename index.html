@@ -180,7 +180,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .chat-thread::-webkit-scrollbar{width:4px}.chat-thread::-webkit-scrollbar-thumb{background:var(--g200);border-radius:2px}
 .chat-bubble{max-width:78%;display:flex;flex-direction:column;padding:7px 11px;border-radius:12px;font-size:12px;line-height:1.5;word-break:break-word}
 .chat-bubble.cph{align-self:flex-end;background:#3B3C3D;color:#F4F0E8;border-bottom-right-radius:3px}
-.chat-bubble.omk{align-self:flex-start;background:rgba(186,162,144,.18);color:#F4F0E8;border:1px solid rgba(186,162,144,.3);border-bottom-left-radius:3px}
+.chat-bubble.omk{align-self:flex-start;background:rgba(186,162,144,.18);color:var(--coal);border:1px solid rgba(186,162,144,.3);border-bottom-left-radius:3px}
 .chat-meta{font-size:10px;opacity:.55;margin-bottom:3px;font-weight:600}
 .chat-input-row{display:flex;gap:8px;padding:8px 16px 12px;align-items:flex-end}
 .chat-inp{flex:1;background:#fff;border:1px solid #ccc;border-radius:8px;padding:7px 10px;font-size:13px;color:#1a1a1a;font-family:var(--fb);resize:none;min-height:36px;max-height:90px}
@@ -388,7 +388,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
   </div>
   <div class="stat-spacer"></div>
   <button class="btn-print" onclick="printView()" data-tip="Print / save as PDF">🖨️ Print</button>
-  <button class="btn-cashflow" onclick="openCashFlow()">💶 Cash Flow</button>
+  <button class="btn-cashflow" id="btn-cashflow" onclick="openCashFlow()">💶 Cash Flow</button>
 </div>
 
 <div class="main" id="main-area"></div>
@@ -539,9 +539,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
       <h2 id="chat-modal-title">💬 Messages</h2>
       <button class="btn-x" onclick="closeChat()">✕</button>
     </div>
-    <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
-      <div class="chat-thread" id="chat-thread-modal" style="flex:1;max-height:none;padding:16px"></div>
-    </div>
+    <div class="chat-thread" id="chat-thread-modal" style="flex:1;overflow-y:auto;max-height:none;padding:16px"></div>
     <div style="border-top:1px solid var(--g200);padding:10px 16px;display:flex;gap:8px;align-items:flex-end">
       <textarea id="chat-modal-inp" class="chat-inp" placeholder="Write a message… (Enter to send, Shift+Enter for new line)" rows="2"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();postNoteModal();}"></textarea>
@@ -1583,6 +1581,7 @@ function updateRoleUI() {
   const isCPH=ST.role==='cphsteel';
   document.getElementById('btn-new').classList.toggle('hidden',!isCPH);
   document.getElementById('sep-new').classList.toggle('hidden',!isCPH);
+  document.getElementById('btn-cashflow').classList.toggle('hidden',!isCPH);
 }
 
 // TOAST
@@ -1623,6 +1622,7 @@ function now() { return new Date().toISOString(); }
 function fmtShort() { return new Date().toLocaleDateString('da-DK',{day:'2-digit',month:'short',year:'2-digit'}); }
 
 function openChat(cpo) {
+  closePhoto(); closeDocs();
   ST.chatCPO=cpo; renderChat();
   document.getElementById('modal-chat').classList.add('open');
   setTimeout(()=>{
