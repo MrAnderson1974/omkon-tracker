@@ -924,7 +924,7 @@ function cardHTML(p, isArchived=false) {
   return `<div class="proj-card ${h}" data-cpo="${esc(p.CPO)}">
 
   <div class="pc-head">
-    <span class="pc-cpo">${p.PONumber?esc(p.PONumber)+`<span style="opacity:.5;margin-left:8px;font-size:9px;font-weight:400">${esc(p.CPO)}</span>`:esc(p.CPO)}</span>
+    <span class="pc-cpo">${p.PONumber?esc(p.PONumber):'—'}</span>
     <span class="pc-name">${esc(p.Name)}</span>
     <span class="pc-resp">${esc(p.Responsible)}</span>
     <div class="pc-tags">${tags}</div>
