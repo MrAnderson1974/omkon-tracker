@@ -824,7 +824,11 @@ function renderAll() {
       <div class="archive-body ${open}">${arch.map(p=>cardHTML(p,true)).join('')}</div>
     </div>`;
   }
+  // Preserve any chat text the user is currently typing
+  const savedChats={};
+  document.querySelectorAll('.chat-inp[data-cpo]').forEach(el=>{if(el.value)savedChats[el.dataset.cpo]=el.value;});
   area.innerHTML=html;
+  Object.keys(savedChats).forEach(cpo=>{const el=document.querySelector('.chat-inp[data-cpo="'+cpo+'"]');if(el)el.value=savedChats[cpo];});
   if(document.getElementById('modal-cf')?.classList.contains('open')) renderCashFlow();
   // Restore open CBAM panels after DOM rebuild
   ST.cbamOpen.forEach(cpo => {
@@ -1598,7 +1602,8 @@ function postNote(cpo) {
   const inp=document.querySelector('.chat-inp[data-cpo="'+cpo+'"]'); if(!inp) return;
   const txt=inp.value.trim(); if(!txt) return;
   const msgs=parseNotes(p.Notes);
-  msgs.push({r:ST.role,a:ST.userName||ST.role,t:txt,ts:new Date().toISOString()});
+  const author=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
+  msgs.push({r:ST.role,a:author,t:txt,ts:new Date().toISOString()});
   p.Notes=JSON.stringify(msgs);
   p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
   const who=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
