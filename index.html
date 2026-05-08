@@ -772,7 +772,11 @@ function fetchSheet() {
         ['Qty','Price','Total','Pct'].forEach(f=>{
           const saved=JSON.parse(localStorage.getItem('omkon_edit_'+p.CPO+'_'+f)||'null');
           if(!saved) return;
-          const otherUserEdited = saved.updated && p.Updated && saved.updated !== p.Updated;
+          // prevUpdated = Sheet timestamp at the moment we made our edit.
+          // If CSV now shows a DIFFERENT timestamp → another user changed the row → discard.
+          // If CSV still shows the same timestamp → our write hasn't landed yet → keep.
+          // If no prevUpdated (old entry) → fall through to 2-min timeout as before.
+          const otherUserEdited = saved.prevUpdated !== undefined && p.Updated && saved.prevUpdated !== p.Updated;
           if(otherUserEdited) {
             localStorage.removeItem('omkon_edit_'+p.CPO+'_'+f);
           } else if((Date.now()-saved.ts)<120000) {
@@ -1506,14 +1510,17 @@ function commitEdit(el, cpo, field, value) {
   let v=value;
   if(field==='Qty'||field==='Price'||field==='Total'||field==='Pct') v=normalizeDaNum(value);
   if(p[field]===v){renderAll();return;}
+  const prevUpdated=p.Updated; // capture BEFORE we change it — used for multi-user conflict detection
   p[field]=v; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
   if((field==='Qty'||field==='Price')&&p.Qty&&p.Price) p.Total=String((parseFloat(p.Qty)*parseFloat(p.Price)).toFixed(2));
   if(field==='OmkonNotes') p.OmkonNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
   if(field==='CPHNotes') p.CPHNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
   // Persist numeric edits in localStorage — protects against slow Apps Script
-  // Store Updated timestamp so we can detect if another user edited the row
+  // prevUpdated = timestamp BEFORE our edit: if Sheet shows a different timestamp later,
+  // another user changed the row → discard. If Sheet still shows prevUpdated, our write
+  // hasn't landed yet → keep localStorage value.
   if(['Qty','Price','Total','Pct'].includes(field))
-    localStorage.setItem('omkon_edit_'+cpo+'_'+field, JSON.stringify({v, ts:Date.now(), updated:p.Updated}));
+    localStorage.setItem('omkon_edit_'+cpo+'_'+field, JSON.stringify({v, ts:Date.now(), prevUpdated}));
   postRow(p); renderAll(); toast('Saved','success');
 }
 function saveExtra(cpo) {
