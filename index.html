@@ -1013,10 +1013,14 @@ function cardHTML(p, isArchived=false) {
         <span class="pay-date-label">Due:</span>
         <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''}  data-tip="Extra services — same date as down payment">${fmtD(p.Pay1Date)||'Date not set'}</span>
       </div>`
-      :isCPH?`<div style="padding:4px 2px 6px">${p.ExtraDesc
-        ?`<span class="ed" style="font-size:11px;color:var(--tan);cursor:pointer" data-cpo="${esc(p.CPO)}" data-f="ExtraAmount" data-t="number" data-tip="Click to set amount">＋ Set amount for: ${esc(p.ExtraDesc)}</span>`
-        :`<span class="ed" style="font-size:11px;color:var(--steel);opacity:.7;cursor:pointer" data-cpo="${esc(p.CPO)}" data-f="ExtraDesc" data-t="text" data-tip="Click to add extra services — enter description first, then amount">＋ Add extra services</span>`
-      }</div>`:''}
+      :isCPH?`<div style="padding:4px 0 6px">
+        <div style="font-size:10px;color:var(--steel);opacity:.6;margin-bottom:4px;font-family:var(--fh);text-transform:uppercase;letter-spacing:.05em">＋ Extra services</div>
+        <div style="display:flex;gap:5px;align-items:center">
+          <input id="xd-${esc(p.CPO)}" placeholder="Description" value="${esc(p.ExtraDesc||'')}" style="flex:1;font-size:11px;padding:4px 7px;border:1px solid var(--g200);border-radius:4px;font-family:var(--fb);color:var(--coal);background:#fff;min-width:0"/>
+          <input id="xa-${esc(p.CPO)}" type="number" placeholder="€ 0.00" min="0" step="0.01" style="width:80px;font-size:11px;padding:4px 7px;border:1px solid var(--g200);border-radius:4px;font-family:var(--fb);color:var(--coal);background:#fff"/>
+          <button onclick="saveExtra('${esc(p.CPO)}')" style="padding:4px 9px;font-size:11px;background:var(--coal);color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:var(--fh);letter-spacing:.04em">Save</button>
+        </div>
+      </div>`:''}
 
       <div class="pay-pill ${p.Pay2Paid?'paid':'due'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-pay="Pay2Paid" data-tip="Click to mark as paid / unpaid"':'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
         <span class="pi">${p.Pay2Paid?'✅':'🔴'}</span>
@@ -1466,12 +1470,16 @@ function commitEdit(el, cpo, field, value) {
   if((field==='Qty'||field==='Price')&&p.Qty&&p.Price) p.Total=String((parseFloat(p.Qty)*parseFloat(p.Price)).toFixed(2));
   if(field==='OmkonNotes') p.OmkonNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
   if(field==='CPHNotes') p.CPHNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
-  const chainAmount = field==='ExtraDesc' && !p.ExtraAmount;
   postRow(p); renderAll(); toast('Saved','success');
-  if(chainAmount) setTimeout(()=>{
-    const el=document.querySelector(`.ed[data-cpo="${cpo}"][data-f="ExtraAmount"]`);
-    if(el) el.click();
-  },80);
+}
+function saveExtra(cpo) {
+  const p=findP(cpo); if(!p) return;
+  const desc=(document.getElementById('xd-'+cpo)||{}).value||'';
+  const amt=(document.getElementById('xa-'+cpo)||{}).value||'';
+  if(!amt||parseFloat(amt)<=0){toast('Enter an amount','warning');return;}
+  p.ExtraDesc=desc||'Extra services'; p.ExtraAmount=amt;
+  p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
+  postRow(p); renderAll(); toast('Saved','success');
 }
 
 // CREATE
