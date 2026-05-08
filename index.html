@@ -751,6 +751,7 @@ function fetchSheet() {
       const projects=rows.slice(1).filter(r=>r[0]).map(row=>{
         const p={Photos:''};
         hdrs.forEach((h,i)=>p[h]=row[i]??'');
+        ['Qty','Price','Total','Pct'].forEach(f=>{if(p[f]) p[f]=normalizeDaNum(p[f]);});
         BOOL_FIELDS.forEach(f=>{p[f]=p[f]==='TRUE'||p[f]==='true'||p[f]===true;});
         const ex=findP(p.CPO);
         if(ex) {
@@ -878,7 +879,7 @@ function calcStats() {
     if(p.Pay2Paid) paid+=t*.50;
     if(p.Pay3Paid) paid+=t*.20;
   });
-  const fT=n=>n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fT=n=>n.toLocaleString('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2});
   const yrLabel = yr==='all' ? 'All years' : yr;
   document.getElementById('st-yr-label').textContent = yrLabel;
   document.getElementById('st-tons').textContent=Math.round(tons/1000).toLocaleString('da-DK')+' t';
