@@ -766,6 +766,13 @@ function fetchSheet() {
           if(ex.ExtraAmount && !p.ExtraAmount) p.ExtraAmount=ex.ExtraAmount;
           if(p.ExtraAmount===undefined || p.ExtraAmount==='') p.ExtraPaid=ex.ExtraPaid||false;
         }
+        // Fallback: localStorage backup for Photos (survives page reload / browser close)
+        if(!p.Photos) {
+          const savedPhotos=localStorage.getItem('omkon_photos_'+p.CPO);
+          if(savedPhotos) p.Photos=savedPhotos;
+        } else {
+          localStorage.setItem('omkon_photos_'+p.CPO, p.Photos);
+        }
         // Fallback: localStorage backup for Extra fields (survives page reload)
         const lsKey='omkon_extra_'+p.CPO;
         if(!p.ExtraAmount) {
@@ -1585,6 +1592,7 @@ function compress(file) {
 function savePhotos() {
   const p=findP(ST.photoCPO); if(!p) return;
   p.Photos=joinP(ST.pendingPhotos); p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
+  localStorage.setItem('omkon_photos_'+p.CPO, p.Photos);
   closePhoto(); renderAll();
   toast(ST.pendingPhotos.length+' photo'+(ST.pendingPhotos.length!==1?'s':'')+' saved','success');
 }
