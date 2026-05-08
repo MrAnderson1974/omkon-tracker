@@ -759,8 +759,10 @@ function fetchSheet() {
         const ex=findP(p.CPO);
         if(ex) {
           p.Photos=ex.Photos;
-          // Preserve local Notes if Sheet returned empty (Apps Script lag) or chat is open for this project
           if(ex.Notes && !p.Notes) p.Notes=ex.Notes;
+          if(ex.ExtraDesc  && !p.ExtraDesc)  p.ExtraDesc=ex.ExtraDesc;
+          if(ex.ExtraAmount && !p.ExtraAmount) p.ExtraAmount=ex.ExtraAmount;
+          if(p.ExtraAmount===undefined || p.ExtraAmount==='') p.ExtraPaid=ex.ExtraPaid||false;
         }
         return p;
       });
