@@ -829,6 +829,16 @@ function postRow(proj) {
   delete payload.Files;  // handled by uploadDocs action — never in row write
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
 }
+// Send only specific fields — Apps Script merge keeps all other Sheet values intact.
+// Use this for every edit EXCEPT project creation, to avoid overwriting another user's fields.
+function postFields(cpo, fields) {
+  if(!CONFIGURED)return;
+  const p=findP(cpo); if(!p) return;
+  _recentWrites[cpo]=Date.now();
+  const payload={CPO:cpo, Updated:p.Updated, UpdatedBy:p.UpdatedBy};
+  fields.forEach(f=>{ if(p[f]!==undefined) payload[f]=p[f]; });
+  fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
+}
 function postGAS(payload) {
   if(!CONFIGURED)return;
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
@@ -1413,7 +1423,7 @@ function bindEvents() {
     card.className='proj-card '+h;
     const badge=card.querySelector('.health-pill');
     badge.className='health-pill '+h; badge.innerHTML=`<span class="hpill-dot"></span>${h}`;
-    postRow(p); toast('Progress → '+e.target.value+'%','success');
+    postFields(p.CPO,['Pct']); toast('Progress → '+e.target.value+'%','success');
   });
   document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
     if(e.target!==o) return;
@@ -1444,13 +1454,13 @@ function doArchive(cpo) {
   if(ST.role!=='cphsteel') return;
   const p=findP(cpo); if(!p) return;
   p.Archived=true; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
-  postRow(p); renderAll(); toast('Project archived','success');
+  postFields(cpo,['Archived']); renderAll(); toast('Project archived','success');
 }
 function doUnarchive(cpo) {
   if(ST.role!=='cphsteel') return;
   const p=findP(cpo); if(!p) return;
   p.Archived=false; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
-  postRow(p); renderAll(); toast('Project reactivated','info');
+  postFields(cpo,['Archived']); renderAll(); toast('Project reactivated','info');
 }
 
 // TOGGLE
@@ -1475,7 +1485,9 @@ function doToggle(cpo, field) {
     msgs.push({r:'system',a:'',ts:new Date().toISOString(),t:sysTxt});
     p.Notes = encodeNotes(msgs);
   }
-  postRow(p); renderAll();
+  const toggleFields=[field];
+  if(CHANGE_NOTE_FIELDS[field]) toggleFields.push('ChangeNote','Notes');
+  postFields(cpo,toggleFields); renderAll();
   const label = field.replace(/([A-Z])/g,' $1').trim();
   toast(label+': '+(p[field]?'Yes ✅':'No 🔴'), p[field]?'success':'warning');
 }
@@ -1521,7 +1533,12 @@ function commitEdit(el, cpo, field, value) {
   // hasn't landed yet → keep localStorage value.
   if(['Qty','Price','Total','Pct'].includes(field))
     localStorage.setItem('omkon_edit_'+cpo+'_'+field, JSON.stringify({v, ts:Date.now(), prevUpdated}));
-  postRow(p); renderAll(); toast('Saved','success');
+  // Only send the changed field (+ Total if recalculated, + note author if applicable)
+  const sendFields=[field];
+  if((field==='Qty'||field==='Price')&&p.Total) sendFields.push('Total');
+  if(field==='OmkonNotes') sendFields.push('OmkonNotesBy');
+  if(field==='CPHNotes') sendFields.push('CPHNotesBy');
+  postFields(cpo, sendFields); renderAll(); toast('Saved','success');
 }
 function saveExtra(cpo) {
   const p=findP(cpo); if(!p) return;
@@ -1530,7 +1547,7 @@ function saveExtra(cpo) {
   if(!amt||parseFloat(amt)<=0){toast('Enter an amount','warning');return;}
   p.ExtraDesc=desc||'Extra services'; p.ExtraAmount=amt;
   p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
-  postRow(p); renderAll(); toast('Saved','success');
+  postFields(cpo,['ExtraDesc','ExtraAmount']); renderAll(); toast('Saved','success');
 }
 
 // CREATE
@@ -1790,7 +1807,7 @@ function postNoteModal() {
   p.Updated=now(); p.UpdatedBy=author;
   const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   p.ChangeNote='Note from '+author+' · '+d+': '+txt.slice(0,50)+(txt.length>50?'…':'');
-  postRow(p); inp.value=''; renderChat();
+  postFields(cpo,['Notes','ChangeNote']); inp.value=''; renderChat();
 }
 
 const NOTE_SEP='^^^', NOTE_FLD='|||';
@@ -1836,7 +1853,7 @@ function postNote(cpo) {
   const who=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
   const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   p.ChangeNote='Note from '+who+' · '+d+': '+txt.slice(0,50)+(txt.length>50?'…':'');
-  postRow(p); inp.value=''; renderAll();
+  postFields(cpo,['Notes','ChangeNote']); inp.value=''; renderAll();
   setTimeout(()=>{const t=document.querySelector('.chat-thread[data-cpo="'+cpo+'"]');if(t)t.scrollTop=t.scrollHeight;},60);
 }
 
