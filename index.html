@@ -1411,8 +1411,11 @@ function cancelEdit() {
 }
 function commitEdit(el, cpo, field, value) {
   if(!activeEl) return; activeEl=null;
-  const p=findP(cpo); if(!p||p[field]===value){renderAll();return;}
-  p[field]=value; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
+  const p=findP(cpo); if(!p){renderAll();return;}
+  let v=value;
+  if(field==='Qty'||field==='Price'||field==='Total'||field==='Pct') v=value.replace(',','.');
+  if(p[field]===v){renderAll();return;}
+  p[field]=v; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
   if((field==='Qty'||field==='Price')&&p.Qty&&p.Price) p.Total=String((parseFloat(p.Qty)*parseFloat(p.Price)).toFixed(2));
   if(field==='OmkonNotes') p.OmkonNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
   if(field==='CPHNotes') p.CPHNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
