@@ -1070,7 +1070,7 @@ function cardHTML(p, isArchived=false) {
     ${p.FilesBy?`<div style="width:100%;font-size:10px;color:var(--steel);font-style:italic;padding-top:2px">Files updated by: ${esc(p.FilesBy)}</div>`:''}
   </div>
 
-  ${p.ChangeNote&&!p.ChangeNote.trim().startsWith('[')&&!p.ChangeNote.trim().startsWith('{')?`<div class="change-note-strip">📋 ${esc((s=>s.indexOf('^^^')>-1?s.slice(0,s.indexOf('^^^')):s.indexOf('|||')>-1?s.slice(0,s.indexOf('|||')):s)(p.ChangeNote).trim())}</div>`:''}
+  ${(()=>{const cn=p.ChangeNote; if(!cn) return ''; const s=cn.trim(); let txt=''; if(s.startsWith('[')||s.startsWith('{')){try{const a=JSON.parse(s);const msgs=Array.isArray(a)?a:[a];const last=msgs[msgs.length-1];if(last&&last.t)txt=(last.a?last.a+': ':'')+last.t;}catch(e){return '';}}else{txt=(s.indexOf('^^^')>-1?s.slice(0,s.indexOf('^^^')):s.indexOf('|||')>-1?s.slice(0,s.indexOf('|||')):s).trim();}return txt?`<div class="change-note-strip">📋 ${esc(txt)}</div>`:'';})()}
   <div class="upd-row">
     <span>Opdateret ${fmtD(p.Updated)}</span>
     ${p.UpdatedBy?`<span>af ${esc(p.UpdatedBy)}</span>`:''}
