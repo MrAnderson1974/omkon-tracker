@@ -805,7 +805,7 @@ function postRow(proj) {
   if(!CONFIGURED)return;
   _recentWrites[proj.CPO]=Date.now();
   const payload={...proj};
-  delete payload.Photos; // handled by uploadFiles action — never in row write
+  // Photos: base64 thumbnails stored directly in Sheet — included in payload
   delete payload.Files;  // handled by uploadDocs action — never in row write
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
 }
@@ -1588,24 +1588,20 @@ function compress(file) {
     const r=new FileReader();
     r.onload=ev=>{
       const img=new Image(); img.onload=()=>{
-        const MAX=800, ratio=Math.min(MAX/img.width,MAX/img.height,1);
+        const MAX=200, ratio=Math.min(MAX/img.width,MAX/img.height,1);
         const c=document.createElement('canvas');
         c.width=Math.round(img.width*ratio); c.height=Math.round(img.height*ratio);
         c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        res(c.toDataURL('image/jpeg',.82));
+        res(c.toDataURL('image/jpeg',.5));
       }; img.src=ev.target.result;
     }; r.readAsDataURL(file);
   });
 }
 function savePhotos() {
   const p=findP(ST.photoCPO); if(!p) return;
-  const ts=now(); const by=ST.userName||ST.role;
-  postGAS({action:'uploadFiles', cpo:p.CPO, photos:ST.pendingPhotos, updated:ts, updatedBy:by});
-  // Optimistic local update — Drive URLs will replace base64 after next CSV poll
-  p.Photos=joinP(ST.pendingPhotos); p.Updated=ts; p.UpdatedBy=by;
-  closePhoto(); renderAll();
-  toast('Fotos uploades til Drive — vises om få sekunder','info');
-  setTimeout(fetchSheet, 8000);
+  p.Photos=joinP(ST.pendingPhotos); p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
+  postRow(p); closePhoto(); renderAll();
+  toast(ST.pendingPhotos.length+' foto'+(ST.pendingPhotos.length!==1?'s':'')+' gemt','success');
 }
 
 // DOCUMENTS
