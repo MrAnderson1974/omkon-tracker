@@ -1458,7 +1458,7 @@ function startEdit(el, cpo, field, type) {
   } else {
     const inp=document.createElement('input');
     inp.className='edit-inp'; inp.type=type==='date'?'date':'text'; if(type==='number'){inp.inputMode='decimal';} inp.value=orig;
-    el.innerHTML=''; el.appendChild(inp); inp.focus(); inp.select();
+    el.innerHTML=''; el.appendChild(inp); inp.focus(); setTimeout(()=>inp.select(),0);
     inp.addEventListener('blur',()=>commitEdit(el,cpo,field,inp.value));
     inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape')cancelEdit();});
   }
