@@ -766,13 +766,6 @@ function fetchSheet() {
           if(ex.ExtraAmount && !p.ExtraAmount) p.ExtraAmount=ex.ExtraAmount;
           if(p.ExtraAmount===undefined || p.ExtraAmount==='') p.ExtraPaid=ex.ExtraPaid||false;
         }
-        // Fallback: localStorage backup for Photos (survives page reload / browser close)
-        if(!p.Photos) {
-          const savedPhotos=localStorage.getItem('omkon_photos_'+p.CPO);
-          if(savedPhotos) p.Photos=savedPhotos;
-        } else {
-          localStorage.setItem('omkon_photos_'+p.CPO, p.Photos);
-        }
         // Fallback: localStorage backup for Extra fields (survives page reload)
         const lsKey='omkon_extra_'+p.CPO;
         if(!p.ExtraAmount) {
@@ -805,8 +798,17 @@ const _recentWrites={};
 function postRow(proj) {
   if(!CONFIGURED)return;
   _recentWrites[proj.CPO]=Date.now();
-  const payload={...proj}; delete payload.Photos;
+  const payload={...proj};
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
+}
+async function uploadToGAS(base64, mimeType, filename) {
+  const res = await fetch(GAS_URL, {
+    method:'POST', mode:'cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'uploadFile', base64, mimeType, filename})
+  });
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error||'Upload failed');
+  return json.url;
 }
 function setLastSync(ok) {
   const el=document.getElementById('sync-time'); if(!el)return;
@@ -1589,12 +1591,26 @@ function compress(file) {
     }; r.readAsDataURL(file);
   });
 }
-function savePhotos() {
+async function savePhotos() {
   const p=findP(ST.photoCPO); if(!p) return;
-  p.Photos=joinP(ST.pendingPhotos); p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
-  localStorage.setItem('omkon_photos_'+p.CPO, p.Photos);
-  closePhoto(); renderAll();
-  toast(ST.pendingPhotos.length+' photo'+(ST.pendingPhotos.length!==1?'s':'')+' saved','success');
+  const btn=document.querySelector('#modal-photo .btn-submit');
+  if(btn){btn.disabled=true; btn.textContent='Uploading...';}
+  try {
+    const urls=[];
+    for(let i=0;i<ST.pendingPhotos.length;i++){
+      const ph=ST.pendingPhotos[i];
+      if(ph.startsWith('http')){urls.push(ph);continue;}
+      if(btn) btn.textContent=`Uploading ${i+1}/${ST.pendingPhotos.length}...`;
+      const mime=ph.split(';')[0].replace('data:','')||'image/jpeg';
+      urls.push(await uploadToGAS(ph,mime,'photo_'+Date.now()+'.jpg'));
+    }
+    p.Photos=joinP(urls); p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
+    postRow(p); closePhoto(); renderAll();
+    toast(urls.length+' photo'+(urls.length!==1?'s':'')+' saved','success');
+  } catch(err) {
+    toast('Upload fejlede: '+err.message,'error');
+    if(btn){btn.disabled=false; btn.textContent='Gem fotos';}
+  }
 }
 
 // DOCUMENTS
@@ -1613,7 +1629,7 @@ function fileIcon(name) {
 function renderDocChips(p) {
   const files=splitFiles(p.Files);
   if(!files.length) return '<span style="color:var(--steel);font-size:12px">No files</span>';
-  return files.map(f=>`<a class="doc-chip" href="${f.url}" download="${esc(f.name)}" onclick="event.stopPropagation()" data-tip="Download ${esc(f.name)}"><span class="doc-chip-icon">${fileIcon(f.name)}</span>${esc(f.name)}</a>`).join('');
+  return files.map(f=>`<a class="doc-chip" href="${f.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" data-tip="Download ${esc(f.name)}"><span class="doc-chip-icon">${fileIcon(f.name)}</span>${esc(f.name)}</a>`).join('');
 }
 function openDocs(cpo) {
   ST.docCPO=cpo; ST.pendingDocs=splitFiles(findP(cpo)?.Files||'');
@@ -1624,7 +1640,7 @@ function closeDocs() { document.getElementById('modal-docs').classList.remove('o
 function renderDocList() {
   const el=document.getElementById('doc-list');
   el.innerHTML=ST.pendingDocs.length
-    ? ST.pendingDocs.map((f,i)=>`<div class="doc-item"><span class="doc-chip-icon">${fileIcon(f.name)}</span><span class="doc-item-name">${esc(f.name)}</span><a href="${f.url}" download="${esc(f.name)}" style="font-size:11px;color:var(--steel);margin-right:6px">⬇ Download</a><button class="doc-item-del" onclick="removeDoc(${i})">✕</button></div>`).join('')
+    ? ST.pendingDocs.map((f,i)=>`<div class="doc-item"><span class="doc-chip-icon">${fileIcon(f.name)}</span><span class="doc-item-name">${esc(f.name)}</span>${f.url.startsWith('http')?`<a href="${f.url}" target="_blank" rel="noopener" style="font-size:11px;color:var(--steel);margin-right:6px">⬇ Download</a>`:'<span style="font-size:11px;color:var(--steel);margin-right:6px">Pending upload</span>'}<button class="doc-item-del" onclick="removeDoc(${i})">✕</button></div>`).join('')
     : '<div style="color:var(--steel);font-size:12px;padding:4px 0">No files added yet</div>';
 }
 function removeDoc(idx) { ST.pendingDocs.splice(idx,1); renderDocList(); }
@@ -1636,12 +1652,28 @@ function handleDocFiles(files) {
     r.readAsDataURL(file);
   });
 }
-function saveDocs() {
+async function saveDocs() {
   const p=findP(ST.docCPO); if(!p) return;
-  p.Files=joinFiles(ST.pendingDocs); p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
-  p.FilesBy=(ST.userName||ST.role)+' · '+fmtShort();
-  postRow(p); closeDocs(); renderAll();
-  toast(ST.pendingDocs.length+' file'+(ST.pendingDocs.length!==1?'s':'')+' saved','success');
+  const btn=document.querySelector('#modal-docs .btn-submit');
+  if(btn){btn.disabled=true; btn.textContent='Uploading...';}
+  try {
+    const uploaded=[];
+    for(let i=0;i<ST.pendingDocs.length;i++){
+      const f=ST.pendingDocs[i];
+      if(f.url.startsWith('http')){uploaded.push(f);continue;}
+      if(btn) btn.textContent=`Uploading ${i+1}/${ST.pendingDocs.length}...`;
+      const mime=f.url.split(';')[0].replace('data:','')||'application/octet-stream';
+      const url=await uploadToGAS(f.url,mime,f.name);
+      uploaded.push({name:f.name,url});
+    }
+    p.Files=joinFiles(uploaded); p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
+    p.FilesBy=(ST.userName||ST.role)+' · '+fmtShort();
+    postRow(p); closeDocs(); renderAll();
+    toast(uploaded.length+' file'+(uploaded.length!==1?'s':'')+' saved','success');
+  } catch(err) {
+    toast('Upload fejlede: '+err.message,'error');
+    if(btn){btn.disabled=false; btn.textContent='Gem';}
+  }
 }
 
 // ROLE
