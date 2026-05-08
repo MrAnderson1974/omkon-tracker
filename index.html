@@ -1070,7 +1070,7 @@ function cardHTML(p, isArchived=false) {
     ${p.FilesBy?`<div style="width:100%;font-size:10px;color:var(--steel);font-style:italic;padding-top:2px">Files updated by: ${esc(p.FilesBy)}</div>`:''}
   </div>
 
-  ${p.ChangeNote?`<div class="change-note-strip">📋 ${esc((s=>s.indexOf('^^^')>-1?s.slice(0,s.indexOf('^^^')):s.indexOf('|||')>-1?s.slice(0,s.indexOf('|||')):s)(p.ChangeNote).trim())}</div>`:''}
+  ${p.ChangeNote&&!p.ChangeNote.trim().startsWith('[')&&!p.ChangeNote.trim().startsWith('{')?`<div class="change-note-strip">📋 ${esc((s=>s.indexOf('^^^')>-1?s.slice(0,s.indexOf('^^^')):s.indexOf('|||')>-1?s.slice(0,s.indexOf('|||')):s)(p.ChangeNote).trim())}</div>`:''}
   <div class="upd-row">
     <span>Opdateret ${fmtD(p.Updated)}</span>
     ${p.UpdatedBy?`<span>af ${esc(p.UpdatedBy)}</span>`:''}
