@@ -458,7 +458,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
           <div class="fg"><label>Amount (€)</label><input type="number" name="extra_amount" placeholder="0.00" min="0" step="0.01"/></div>
           <div class="fsec">Timeline &amp; Payment Dates</div>
           <div class="fg"><label>Shipping / Deadline *</label><input type="date" name="deadline" required/></div>
-          <div class="fg"><label>Pickup date *</label><input type="date" name="pickup" required/></div>
+          <div class="fg"><label>Pickup date *</label><input type="date" name="pickup" required oninput="const v=this.value;const f=document.querySelector('[name=pay2_date]');if(f&&!f.value)f.value=v;"/></div>
           <div class="fg"><label>Project start (down payment date)</label><input type="date" name="pay1_date"/></div>
           <div class="fg"><label>2nd payment date (pick up)</label><input type="date" name="pay2_date"/></div>
           <div class="fg s2" style="flex-direction:row;align-items:center;gap:10px">
@@ -970,6 +970,11 @@ function cardHTML(p, isArchived=false) {
       <div class="pcs-title">Pricing &amp; Progress</div>
       <div class="pf"><span class="pfl">Total</span>
         <span class="pfv eur ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Total" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Contract value ex. VAT':'Contract value — set by CPH Steel'}">€ ${fmtEur(total)||'—'}</span></div>
+      ${parseFloat(p.ExtraAmount)>0?`
+      <div class="pf" style="opacity:.75"><span class="pfl" style="font-style:italic">${esc(p.ExtraDesc||'Extra services')}</span>
+        <span class="pfv eur" style="font-style:italic">€ ${fmtEur(p.ExtraAmount)}</span></div>
+      <div class="pf" style="border-top:1px solid rgba(0,0,0,.1);margin-top:4px;padding-top:4px"><span class="pfl" style="font-weight:700">Grand total</span>
+        <span class="pfv eur" style="font-weight:700">€ ${fmtEur(total+(parseFloat(p.ExtraAmount)||0))}</span></div>`:''}
       <div class="pf"><span class="pfl">Quantity (kg)</span>
         <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Qty" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Weight of steel delivered':'Total steel weight in kg'}">${fmt(p.Qty)||'—'}</span></div>
       <div class="pf"><span class="pfl">Price / kg</span>
@@ -998,6 +1003,17 @@ function cardHTML(p, isArchived=false) {
         <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pay1Date" data-t="date"':''} data-tip="${isCPH?'Click to edit · Down payment due date':'Down payment due date'}">${fmtD(p.Pay1Date)||'Date not set'}</span>
       </div>
 
+      ${parseFloat(p.ExtraAmount)>0?`
+      <div class="pay-pill ${p.ExtraPaid?'paid':'due'}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-pay="ExtraPaid" data-tip="Click to mark as paid / unpaid"`:'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
+        <span class="pi">${p.ExtraPaid?'✅':'🔴'}</span>
+        <span class="plabel">${esc(p.ExtraDesc||'Extra services')}</span>
+        <span class="pamt">€ ${fmtEur(p.ExtraAmount)}</span>
+      </div>
+      <div class="pay-date-row">
+        <span class="pay-date-label">Due:</span>
+        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''}  data-tip="Extra services — same date as down payment">${fmtD(p.Pay1Date)||'Date not set'}</span>
+      </div>`:''}
+
       <div class="pay-pill ${p.Pay2Paid?'paid':'due'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-pay="Pay2Paid" data-tip="Click to mark as paid / unpaid"':'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
         <span class="pi">${p.Pay2Paid?'✅':'🔴'}</span>
         <span class="plabel">2nd payment (50%)</span>
@@ -1007,14 +1023,6 @@ function cardHTML(p, isArchived=false) {
         <span class="pay-date-label">Pick up:</span>
         <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pickup" data-t="date"':''} data-tip="${isCPH?'Click to edit · 2nd payment due at pickup':'2nd payment is due at pickup date'}">${fmtD(p.Pickup)||'Date not set'}</span>
       </div>
-
-      ${parseFloat(p.ExtraAmount)>0?`
-      <div class="pay-pill ${p.ExtraPaid?'paid':'due'}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-pay="ExtraPaid" data-tip="Click to mark as paid / unpaid"`:'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
-        <span class="pi">${p.ExtraPaid?'✅':'🔴'}</span>
-        <span class="plabel">${esc(p.ExtraDesc||'Extra services')}</span>
-        <span class="pamt">€ ${fmtEur(p.ExtraAmount)}</span>
-      </div>
-      <div class="pay-date-row"><span class="pay-date-label" style="font-style:italic;opacity:.7">Additional service</span></div>`:''}
 
       <div class="pay-pill ${p3Class}" ${p3Click}>
         <span class="pi">${p3Icon}</span>
@@ -1160,6 +1168,8 @@ function renderCashFlow() {
     if(!p.KS_DocApproved) missing.push('KS doc. approved');
     if(!p.CBAM_Registered) missing.push('CBAM not verified');
     entries.push({cpo:p.CPO, name:p.Name, label:'Down payment (30%)', sub:'Project start', amount:t*.30, date:d1, paid:p.Pay1Paid, locked:false, est:false, missing:[], sortDate:d1||'9999'});
+    const ex=parseFloat(p.ExtraAmount)||0;
+    if(ex>0) entries.push({cpo:p.CPO, name:p.Name, label:p.ExtraDesc||'Extra services', sub:'Additional service', amount:ex, date:d1, paid:p.ExtraPaid, locked:false, est:false, missing:[], sortDate:d1||'9999'});
     entries.push({cpo:p.CPO, name:p.Name, label:'2nd payment (50%)', sub:'At pickup', amount:t*.50, date:d2, paid:p.Pay2Paid, locked:false, est:false, missing:[], sortDate:d2||'9999'});
     entries.push({cpo:p.CPO, name:p.Name, label:'Final payment (20%)', sub:'Pickup +30 days', amount:t*.20, date:d3raw, paid:p.Pay3Paid, locked:!fu, est:d3est, missing, sortDate:d3raw||'9999'});
   });
@@ -1241,9 +1251,9 @@ function exportExcel() {
     const d2=cleanDate(p.Pickup)||'';
     const d3=finalDate(p)||'';
     cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'Down payment (30%)',+(t*.30).toFixed(2),d1,'No',p.Pay1Paid?'Yes':'No','']);
-    cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'2nd payment (50%)',+(t*.50).toFixed(2),d2,'No',p.Pay2Paid?'Yes':'No','']);
     const ex=parseFloat(p.ExtraAmount)||0;
-    if(ex>0) cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,p.ExtraDesc||'Extra services',+ex.toFixed(2),'','No',p.ExtraPaid?'Yes':'No','']);
+    if(ex>0) cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,p.ExtraDesc||'Extra services',+ex.toFixed(2),d1,'No',p.ExtraPaid?'Yes':'No','']);
+    cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'2nd payment (50%)',+(t*.50).toFixed(2),d2,'No',p.Pay2Paid?'Yes':'No','']);
     cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'Final payment (20%)',+(t*.20).toFixed(2),d3,!cleanDate(p.Pay3Date)&&!!d3?'Yes':'No',p.Pay3Paid?'Yes':'No',fu?'Yes':'No']);
   });
   // Summary block
