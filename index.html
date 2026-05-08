@@ -802,6 +802,14 @@ function fetchSheet() {
         }
         return p;
       });
+      // Re-inject new projects created locally but not yet in CSV (Apps Script lag)
+      Object.keys(localStorage).filter(k=>k.startsWith('omkon_new_')).forEach(k=>{
+        const saved=JSON.parse(localStorage.getItem(k)||'null');
+        if(!saved) return;
+        if(Date.now()-saved.ts>120000){localStorage.removeItem(k);return;} // 2 min expiry
+        if(!projects.find(p=>p.CPO===saved.proj.CPO)) projects.unshift(saved.proj);
+        else localStorage.removeItem(k); // now in CSV — no longer needed
+      });
       ST.projects=projects; setLastSync(true);
       const extraActive=document.activeElement&&(document.activeElement.id||'').match(/^x[da]-/);
       if(!document.querySelector('.edit-inp')&&!extraActive) { renderYearTabs(); renderAll(); rebuildPersonFilter(); }
@@ -1562,7 +1570,9 @@ function submitCreate(e) {
   e.preventDefault();
   const fd=new FormData(e.target), g=k=>fd.get(k)||'';
   const yr=new Date().getFullYear();
-  const nums=ST.projects.map(p=>p.CPO).filter(c=>c.startsWith('CPO-'+yr+'-')).map(c=>parseInt(c.split('-')[2])||0);
+  // Include localStorage-pending new projects to avoid CPO collision between users
+  const lsCPOs=Object.keys(localStorage).filter(k=>k.startsWith('omkon_new_CPO-'+yr+'-')).map(k=>k.replace('omkon_new_',''));
+  const nums=[...ST.projects.map(p=>p.CPO),...lsCPOs].filter(c=>c.startsWith('CPO-'+yr+'-')).map(c=>parseInt(c.split('-')[2])||0);
   const cpo='CPO-'+yr+'-'+(Math.max(0,...nums)+1).toString().padStart(4,'0');
   const q=parseFloat(g('qty'))||0, pr=parseFloat(g('price'))||0;
   const proj={
@@ -1580,6 +1590,8 @@ function submitCreate(e) {
     OmkonNotes:'', OmkonNotesBy:'', CPHNotes:'', CPHNotesBy:'',
     Photos:'', Files:'', Updated:now(), UpdatedBy:ST.userName||ST.role, Archived:false,
   };
+  // Persist new project in localStorage for 2 min — survives page reload before Apps Script lands
+  localStorage.setItem('omkon_new_'+cpo, JSON.stringify({proj, ts:Date.now()}));
   ST.projects.unshift(proj); postRow(proj); closeCreate(); renderYearTabs(); renderAll(); rebuildPersonFilter();
   toast('Project '+cpo+' created','success');
 }
