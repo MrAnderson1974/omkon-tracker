@@ -775,7 +775,8 @@ function fetchSheet() {
         return p;
       });
       ST.projects=projects; setLastSync(true);
-      if(!document.querySelector('.edit-inp')) { renderYearTabs(); renderAll(); rebuildPersonFilter(); }
+      const extraActive=document.activeElement&&(document.activeElement.id||'').match(/^x[da]-/);
+      if(!document.querySelector('.edit-inp')&&!extraActive) { renderYearTabs(); renderAll(); rebuildPersonFilter(); }
     }).catch(()=>setLastSync(false));
 }
 function parseCSV(text) {
