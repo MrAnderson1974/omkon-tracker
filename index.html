@@ -757,6 +757,8 @@ function fetchSheet() {
         ['Qty','Price','Total','Pct','ExtraAmount'].forEach(f=>{if(p[f]) p[f]=normalizeDaNum(p[f]);});
         BOOL_FIELDS.forEach(f=>{p[f]=p[f]==='TRUE'||p[f]==='true'||p[f]===true;});
         const ex=findP(p.CPO);
+        // If written within last 30s, keep local version — Apps Script may not have processed yet
+        if(ex && _recentWrites[p.CPO] && (Date.now()-_recentWrites[p.CPO])<30000) return ex;
         if(ex) {
           p.Photos=ex.Photos;
           if(ex.Notes && !p.Notes) p.Notes=ex.Notes;
@@ -792,8 +794,10 @@ function parseCSV(text) {
   if(row.length){row.push(cell);rows.push(row);}
   return rows;
 }
+const _recentWrites={};
 function postRow(proj) {
   if(!CONFIGURED)return;
+  _recentWrites[proj.CPO]=Date.now();
   const payload={...proj}; delete payload.Photos;
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
 }
