@@ -764,6 +764,14 @@ function fetchSheet() {
           if(ex.ExtraAmount && !p.ExtraAmount) p.ExtraAmount=ex.ExtraAmount;
           if(p.ExtraAmount===undefined || p.ExtraAmount==='') p.ExtraPaid=ex.ExtraPaid||false;
         }
+        // Fallback: localStorage backup for Extra fields (survives page reload)
+        const lsKey='omkon_extra_'+p.CPO;
+        if(!p.ExtraAmount) {
+          const saved=JSON.parse(localStorage.getItem(lsKey)||'null');
+          if(saved){p.ExtraDesc=saved.d||'';p.ExtraAmount=saved.a||'';p.ExtraPaid=saved.p||false;}
+        } else {
+          localStorage.setItem(lsKey,JSON.stringify({d:p.ExtraDesc,a:p.ExtraAmount,p:p.ExtraPaid}));
+        }
         return p;
       });
       ST.projects=projects; setLastSync(true);
