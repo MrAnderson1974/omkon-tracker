@@ -767,11 +767,27 @@ function fetchSheet() {
           if(p.ExtraAmount===undefined || p.ExtraAmount==='') p.ExtraPaid=ex.ExtraPaid||false;
         }
         // Protect numeric edits for 2 min — survives slow Apps Script processing
+        // BUT: if another user changed this row (Updated differs), discard localStorage
+        let priceOrQtyRestored = false;
         ['Qty','Price','Total','Pct'].forEach(f=>{
           const saved=JSON.parse(localStorage.getItem('omkon_edit_'+p.CPO+'_'+f)||'null');
-          if(saved&&(Date.now()-saved.ts)<120000) p[f]=saved.v;
-          else if(saved) localStorage.removeItem('omkon_edit_'+p.CPO+'_'+f);
+          if(!saved) return;
+          const otherUserEdited = saved.updated && p.Updated && saved.updated !== p.Updated;
+          if(otherUserEdited) {
+            localStorage.removeItem('omkon_edit_'+p.CPO+'_'+f);
+          } else if((Date.now()-saved.ts)<120000) {
+            p[f]=saved.v;
+            if(f==='Price'||f==='Qty') priceOrQtyRestored=true;
+          } else {
+            localStorage.removeItem('omkon_edit_'+p.CPO+'_'+f);
+          }
         });
+        // If Price or Qty came from localStorage, recalculate Total to stay consistent
+        if(priceOrQtyRestored){
+          const qty=parseFloat(String(p.Qty||'').replace(/\./g,'').replace(',','.'))||0;
+          const price=parseFloat(String(p.Price||'').replace(/\./g,'').replace(',','.'))||0;
+          if(qty&&price) p.Total=(qty*price).toLocaleString('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2});
+        }
         // Fallback: localStorage backup for Extra fields (survives page reload)
         const lsKey='omkon_extra_'+p.CPO;
         if(!p.ExtraAmount) {
@@ -1494,9 +1510,10 @@ function commitEdit(el, cpo, field, value) {
   if((field==='Qty'||field==='Price')&&p.Qty&&p.Price) p.Total=String((parseFloat(p.Qty)*parseFloat(p.Price)).toFixed(2));
   if(field==='OmkonNotes') p.OmkonNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
   if(field==='CPHNotes') p.CPHNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
-  // Persist numeric edits in localStorage for 2 min — protects against slow Apps Script
+  // Persist numeric edits in localStorage — protects against slow Apps Script
+  // Store Updated timestamp so we can detect if another user edited the row
   if(['Qty','Price','Total','Pct'].includes(field))
-    localStorage.setItem('omkon_edit_'+cpo+'_'+field, JSON.stringify({v, ts:Date.now()}));
+    localStorage.setItem('omkon_edit_'+cpo+'_'+field, JSON.stringify({v, ts:Date.now(), updated:p.Updated}));
   postRow(p); renderAll(); toast('Saved','success');
 }
 function saveExtra(cpo) {
