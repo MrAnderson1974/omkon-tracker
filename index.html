@@ -994,7 +994,7 @@ function cardHTML(p, isArchived=false) {
           <span class="prog-pct" data-cpo="${esc(p.CPO)}">${pct}%</span>
         </div>
         <div class="prog-bar"><div class="prog-fill ${pc}" style="width:${pct}%" data-cpo="${esc(p.CPO)}"></div></div>
-        <input type="range" class="prog-slider" value="${pct}" min="0" max="100" data-cpo="${esc(p.CPO)}" ${isCPH?'':'disabled style="opacity:.4;cursor:not-allowed"'} />
+        <input type="range" class="prog-slider" value="${pct}" min="0" max="100" data-cpo="${esc(p.CPO)}" ${isCPH?'disabled style="opacity:.4;cursor:not-allowed"':''} />
       </div>
     </div>
 
