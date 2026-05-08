@@ -1013,7 +1013,10 @@ function cardHTML(p, isArchived=false) {
         <span class="pay-date-label">Due:</span>
         <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''}  data-tip="Extra services — same date as down payment">${fmtD(p.Pay1Date)||'Date not set'}</span>
       </div>`
-      :isCPH?`<div style="padding:4px 2px 6px"><span class="ed" style="font-size:11px;color:var(--steel);opacity:.7;cursor:pointer" data-cpo="${esc(p.CPO)}" data-f="ExtraDesc" data-t="text" data-tip="Click to add extra services — enter description first, then amount">＋ Add extra services</span></div>`:''}
+      :isCPH?`<div style="padding:4px 2px 6px">${p.ExtraDesc
+        ?`<span class="ed" style="font-size:11px;color:var(--tan);cursor:pointer" data-cpo="${esc(p.CPO)}" data-f="ExtraAmount" data-t="number" data-tip="Click to set amount">＋ Set amount for: ${esc(p.ExtraDesc)}</span>`
+        :`<span class="ed" style="font-size:11px;color:var(--steel);opacity:.7;cursor:pointer" data-cpo="${esc(p.CPO)}" data-f="ExtraDesc" data-t="text" data-tip="Click to add extra services — enter description first, then amount">＋ Add extra services</span>`
+      }</div>`:''}
 
       <div class="pay-pill ${p.Pay2Paid?'paid':'due'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-pay="Pay2Paid" data-tip="Click to mark as paid / unpaid"':'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
         <span class="pi">${p.Pay2Paid?'✅':'🔴'}</span>
