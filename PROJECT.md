@@ -23,19 +23,24 @@ const GAS_URL  = 'https://script.google.com/macros/s/AKfycbyVxID4TA4t5muFeeHxPx0
 
 ---
 
-## Apps Script COLS — kolonne-rækkefølge (MÅ IKKE ÆNDRES uden synkronisering)
+## Datamodel — PO som primær nøgle (v6, 2026-05-11)
+
+**PO (Purchase Order)** er den unikke identifier for hver projektrække. Brugeren angiver PO ved oprettelse. Ingen client-side generering, ingen race conditions.
 
 ```javascript
-const COLS = ['CPO','Name','Responsible','Email','Phone','KS_Tags','Qty','Price','Total',
+const COLS = ['PO','Name','Responsible','Email','Phone','KS_Tags','Qty','Price','Total',
   'Pay1Paid','Pay2Paid','Pay3Paid','GoodsReceived','DeliveryApproved','DeliveryRemarks',
   'Deadline','Pickup','PickupConfirmed','KS_DocReceived','KS_DocApproved','KS_Remarks',
   'Pct','OmkonNotes','CPHNotes','Updated','UpdatedBy','Archived','Files',
   'Pay1Date','Pay2Date','Pay3Date','ShippingDate',
   'CBAM_CNCode','CBAM_Route','CBAM_EmDirect','CBAM_EmIndirect','CBAM_Registered',
-  'PONumber','ChangeNote','CBAM_Submitted','Notes'];
+  'ChangeNote','CBAM_Submitted','Notes',
+  'ExtraDesc','ExtraAmount','ExtraPaid','Photos'];
 ```
 
+⚠️ Apps Script skriver altid COLS som header-række 1 ved hver write — sikrer kolonne-alignment automatisk.
 ⚠️ Hvis kolonner tilføjes/flyttes i Sheet skal Apps Script redeployes med ny version.
+⚠️ **Tidligere CPO-felt + separate PONumber-felt er fjernet** — én PO som primær nøgle.
 
 ---
 
@@ -43,7 +48,7 @@ const COLS = ['CPO','Name','Responsible','Email','Phone','KS_Tags','Qty','Price'
 
 ```javascript
 const BOOL_FIELDS = ['Pay1Paid','Pay2Paid','Pay3Paid','GoodsReceived','DeliveryApproved',
-  'PickupConfirmed','KS_DocReceived','KS_DocApproved','Archived','CBAM_Registered','CBAM_Submitted'];
+  'PickupConfirmed','KS_DocReceived','KS_DocApproved','Archived','CBAM_Registered','CBAM_Submitted','ExtraPaid'];
 ```
 
 ⚠️ Alle boolean-felter SKAL stå her — ellers læses "TRUE"/"FALSE" som streng og vises altid som Yes.
@@ -151,8 +156,14 @@ GoodsReceived && DeliveryApproved && KS_DocReceived && KS_DocApproved && CBAM_Su
 
 | Dato | Commit | Beskrivelse |
 |------|--------|-------------|
+| 2026-05-11 | `3950568` | **Refactor: PO som primær nøgle — CPO-koncept fjernet helt.** Client-side CPO-generering forårsagede race conditions mellem create og toggle writes, og krævede `omkon_new_*` localStorage-workarounds for at overleve refresh før GAS landede. PO findes allerede som ERP-reference og er nu den ene unikke identifier. Apps Script v6 deployes. ~100 referencer i index.html ombygget (p.CPO→p.PO, data-cpo→data-po, payload {CPO:..}→{PO:..}). submitCreate validerer PO ikke-tom + unikhed i stedet for at generere. PONumber-redundant felt fjernet fra cash flow + exports. DEMO data omdøbt til 25001-25007. |
+| 2026-05-11 | `*` | **Fix: data tabt ved refresh** — `_recentWrites` var in-memory og forsvandt ved refresh. Boolean toggles og tekst-felter blev ikke gemt i localStorage (kun numeriske). `commitEdit` udvidet til at gemme ALLE felter, `doToggle` capturer prevUpdated + gemmer toggled felter. `fetchSheet` dynamisk restore-loop over alle `omkon_edit_*` nøgler (ikke kun hardkodet liste). Timeout fra 2 min → 5 min. |
 | 2026-05-08 | `fdfdb78` | **Fix: dansk komma-decimal i inline edit** — `parseFloat("2,5")` = `2` i JS. Tilføjet `value.replace(',','.')` i `commitEdit()` for felterne `Qty`, `Price`, `Total`, `Pct` inden lagring. |
 | 2026-05-08 | `12b0b6d` | **Fix: da-DK tusindtalsformat** — `"15.000"` blev tolket som `15`. Ny `normalizeDaNum()`: komma → fjern tusindpunkter + konvertér decimal; mønster `^\d{1,3}(\.\d{3})+$` → strip tusindpunkter; ellers behold som dot-decimal. Bruges i `commitEdit()`, `fmt()`, `fmtEur()`. |
+| 2026-05-08 | `8ccbd8d` | **Feature: Extra services betalingslinje** — ny valgfri betalingslinje (ExtraDesc, ExtraAmount, ExtraPaid) mellem Down payment og 2nd payment. Vises i Pricing & Progress med Grand total. Inline edit på kortet (CPH Steel). localStorage-fallback + fetchSheet-preservation. create form auto-udfylder 2nd payment dato fra pickup dato. |
+| 2026-05-08 | `7141c6f` | **Fix: ChangeNote strip fallback** — viser seneste Notes-besked hvis ChangeNote-kolonnen er tom. |
+| 2026-05-08 | `fb1977d` | **Fix: progress slider roller** — slider var disabled for Omkon (forkert). Nu: Omkon kan trække slider, CPH Steel er read-only. |
+| 2026-05-08 | `*` | **Fix: Apps Script** — skriver COLS som header-række 1 ved hver write. Sikrer kolonne-alignment permanent. ExtraDesc/ExtraAmount/ExtraPaid tilføjet til COLS. |
 
 ---
 
@@ -172,8 +183,10 @@ GoodsReceived && DeliveryApproved && KS_DocReceived && KS_DocApproved && CBAM_Su
 | Fotos + dokumenter upload | ✅ Stabil |
 | Excel-export (SheetJS) | ✅ Stabil |
 | Cash Flow modal (kun CPH Steel) | ✅ Stabil |
-| ChangeNote-strip (seneste hændelse) | ✅ Stabil |
+| ChangeNote-strip (seneste hændelse + fallback) | ✅ Stabil |
 | GitHub Pages deploy via git push | ✅ Stabil |
+| Extra services betalingslinje | ✅ Stabil |
+| Progress slider (Omkon styrer) | ✅ Rettet |
 
 ---
 
