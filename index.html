@@ -1645,16 +1645,25 @@ function handleFiles(files) {
   });
   document.getElementById('file-inp').value='';
 }
+// Google Sheets cell limit: 50,000 chars. With multiple photos joined, keep each well under.
+// Target: < 20,000 chars per photo. Loop reduces quality until guaranteed safe.
+const PHOTO_CHAR_LIMIT = 20000;
 function compress(file) {
   return new Promise(res=>{
     const r=new FileReader();
     r.onload=ev=>{
       const img=new Image(); img.onload=()=>{
-        const MAX=200, ratio=Math.min(MAX/img.width,MAX/img.height,1);
-        const c=document.createElement('canvas');
-        c.width=Math.round(img.width*ratio); c.height=Math.round(img.height*ratio);
-        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        res(c.toDataURL('image/jpeg',.5));
+        function tryCompress(maxPx, quality) {
+          const ratio=Math.min(maxPx/img.width,maxPx/img.height,1);
+          const c=document.createElement('canvas');
+          c.width=Math.round(img.width*ratio); c.height=Math.round(img.height*ratio);
+          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+          const out=c.toDataURL('image/jpeg',quality);
+          if(out.length<=PHOTO_CHAR_LIMIT || quality<=0.15) return out;
+          if(quality>0.2) return tryCompress(maxPx, Math.round((quality-0.1)*10)/10);
+          return tryCompress(Math.round(maxPx*0.7), 0.2); // shrink dimensions too
+        }
+        res(tryCompress(200, 0.5));
       }; img.src=ev.target.result;
     }; r.readAsDataURL(file);
   });
