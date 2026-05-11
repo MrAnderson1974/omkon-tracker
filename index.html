@@ -265,7 +265,38 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
   .main{padding:0}
   .cbam-body{display:block!important}
 }
-
+/* MOBILE */
+@media (max-width: 720px){
+  .h-inner{padding:0 12px;height:auto;min-height:60px;gap:8px;flex-wrap:wrap}
+  .h-logo img{max-height:36px;max-width:120px}
+  .h-role-block{display:none}
+  .h-div{display:none}
+  .session-info{margin-left:auto;font-size:11px}
+  .toolbar{padding:8px 12px;top:auto;position:static}
+  .t-inner{gap:6px}
+  .search-wrap input{width:100%}
+  .stats-bar{padding:0 12px;gap:0}
+  .stat-block{padding:10px 12px}
+  .stat-val{font-size:15px}
+  .stat-divider,.stat-spacer{display:none}
+  .btn-print,.btn-cashflow{padding:8px 12px;font-size:11px}
+  .main{padding:12px;gap:12px}
+  .pc-head{grid-template-columns:1fr auto;grid-template-areas:"po health" "name name" "resp tags" "actions actions";gap:6px;padding:10px 14px}
+  .pc-cpo{grid-area:po;font-size:11px}
+  .pc-name{grid-area:name;font-size:14px;white-space:normal}
+  .pc-resp{grid-area:resp;font-size:11px}
+  .pc-tags{grid-area:tags;justify-self:end}
+  .health-pill{grid-area:health}
+  .btn-archive,.btn-unarchive{grid-area:actions;justify-self:start}
+  .pc-body{grid-template-columns:1fr}
+  .pcs{border-right:none;border-bottom:1px solid var(--g200);padding:12px 14px}
+  .pcs:last-child{border-bottom:none}
+  .cbam-grid,.fgrid{grid-template-columns:1fr}
+  .modal{max-width:100%;max-height:100vh;border-radius:0}
+  .cf-table{font-size:10px;min-width:520px}
+  .year-tabs{padding:0 12px;flex-wrap:wrap}
+  .login-box{width:90%;max-width:340px}
+}
 </style>
 </head>
 <body>
