@@ -1675,7 +1675,8 @@ function savePhotos() {
   // If project was JUST created by this browser (< 30s ago), send full row to win the
   // race against postRow. Otherwise send only Photos — avoids overwriting another user's
   // fields with this browser's potentially incomplete view of the project.
-  const justCreated=_recentWrites[p.CPO]&&(Date.now()-_recentWrites[p.CPO])<30000;
+  // justCreated: only true when submitCreate set the omkon_new_ key — not just any recent write
+  const justCreated=!!localStorage.getItem('omkon_new_'+p.CPO);
   if(justCreated){
     const payload={...p}; delete payload.Files;
     fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(()=>{});
