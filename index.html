@@ -735,9 +735,10 @@ function fetchSheet() {
         } else {
           // CPO is in CSV but may be incomplete — merge localStorage fields that are empty
           const csvProj=projects[csvIdx];
+          const landedInCSV=!!csvProj.Name; // check raw CSV state BEFORE merging localStorage
           Object.keys(saved.proj).forEach(f=>{ if(!csvProj[f] && saved.proj[f] !== undefined) csvProj[f]=saved.proj[f]; });
-          // Only discard localStorage once key project data has landed in CSV
-          if(csvProj.Name) localStorage.removeItem(k);
+          // Only discard localStorage once the CSV itself has Name — not after we injected it
+          if(landedInCSV) localStorage.removeItem(k);
         }
       });
       ST.projects=projects; setLastSync(true);
@@ -1593,7 +1594,7 @@ function postNoteModal() {
   p.Updated=now(); p.UpdatedBy=author;
   const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   p.ChangeNote='Note from '+author+' · '+d+': '+txt.slice(0,50)+(txt.length>50?'…':'');
-  postFields(cpo,['Notes','ChangeNote']); inp.value=''; renderChat();
+  postFields(ST.chatCPO,['Notes','ChangeNote']); inp.value=''; renderChat();
 }
 
 const NOTE_SEP='^^^', NOTE_FLD='|||';
