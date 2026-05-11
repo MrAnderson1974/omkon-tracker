@@ -318,7 +318,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
         <option value="deadline|asc">Deadline ↑</option>
         <option value="deadline|desc">Deadline ↓</option>
         <option value="name|asc">Name A→Z</option>
-        <option value="cpo|desc">CPO newest</option>
+        <option value="cpo|desc">PO newest</option>
         <option value="status|desc">Progress ↓</option>
       </select>
     </div>
@@ -501,7 +501,7 @@ const BOOL_FIELDS = ['Pay1Paid','Pay2Paid','Pay3Paid','GoodsReceived','DeliveryA
 
 function dn(d){const dt=new Date();dt.setDate(dt.getDate()+d);return dt.toISOString().slice(0,10);}
 const DEMO = [
-  { CPO:'CPO-2025-0001', Name:'Steel Facade — Vesterbro Office Building',
+  { PO:'25001', Name:'Steel Facade — Vesterbro Office Building',
     Responsible:'Lars Nielsen', Email:'lars@omkon.dk', Phone:'+45 21 34 56 78',
     KS_Tags:'KS-A, KS-B', Qty:'8500', Price:'14.50', Total:'123250',
     Pay1Paid:true, Pay2Paid:true, Pay3Paid:false,
@@ -511,7 +511,7 @@ const DEMO = [
     Pct:'75', OmkonNotes:'Steel cut and primed. Ready for delivery.',
     CPHNotes:'Awaiting installation slot — week 18.',
     Photos:'', Updated:'2025-04-18T10:30:00Z', UpdatedBy:'Lars Nielsen' },
-  { CPO:'CPO-2025-0002', Name:'Load-Bearing Structure — Amager Strand Pavilion',
+  { PO:'25002', Name:'Load-Bearing Structure — Amager Strand Pavilion',
     Responsible:'Mette Christiansen', Email:'mette@cphsteel.dk', Phone:'+45 31 22 44 66',
     KS_Tags:'KS-C', Qty:'3200', Price:'18.00', Total:'57600',
     Pay1Paid:true, Pay2Paid:false, Pay3Paid:false,
@@ -521,7 +521,7 @@ const DEMO = [
     Pct:'40', OmkonNotes:'Delay on special profiles — supplier issue.',
     CPHNotes:'CRITICAL — site meeting Friday.',
     Photos:'', Updated:'2025-04-22T14:15:00Z', UpdatedBy:'Mette Christiansen' },
-  { CPO:'CPO-2025-0003', Name:'Roof Steel — Frederiksberg Sports Hall',
+  { PO:'25003', Name:'Roof Steel — Frederiksberg Sports Hall',
     Responsible:'Søren Holm', Email:'s.holm@omkon.dk', Phone:'+45 40 11 22 33',
     KS_Tags:'KS-A, KS-D', Qty:'12000', Price:'11.80', Total:'141600',
     Pay1Paid:false, Pay2Paid:false, Pay3Paid:false,
@@ -531,7 +531,7 @@ const DEMO = [
     Pct:'20', OmkonNotes:'Engineering complete. Production week 20.',
     CPHNotes:'Architect requests surface treatment meeting.',
     Photos:'', Updated:'2025-04-10T09:00:00Z', UpdatedBy:'Søren Holm' },
-  { CPO:'CPO-2025-0004', Name:'Steel Staircases — Nordhavn Residential',
+  { PO:'25004', Name:'Steel Staircases — Nordhavn Residential',
     Responsible:'Camilla Brandt', Email:'c.brandt@cphsteel.dk', Phone:'+45 50 66 77 88',
     KS_Tags:'KS-B', Qty:'950', Price:'22.00', Total:'20900',
     Pay1Paid:true, Pay2Paid:true, Pay3Paid:false,
@@ -541,7 +541,7 @@ const DEMO = [
     Pct:'95', OmkonNotes:'Final weld remaining.',
     CPHNotes:'Client requests early pickup if possible.',
     Photos:'', Updated:'2025-04-23T16:45:00Z', UpdatedBy:'Camilla Brandt' },
-  { CPO:'CPO-2025-0005', Name:'Pergola Steel Frame — Hellerup Villa',
+  { PO:'25005', Name:'Pergola Steel Frame — Hellerup Villa',
     Responsible:'Lars Nielsen', Email:'lars@omkon.dk', Phone:'+45 21 34 56 78',
     KS_Tags:'KS-A', Qty:'420', Price:'28.50', Total:'11970',
     Pay1Paid:true, Pay2Paid:false, Pay3Paid:false,
@@ -551,7 +551,7 @@ const DEMO = [
     Pct:'55', OmkonNotes:'Powder coating delayed 4 days.',
     CPHNotes:'Private client — handle with care.',
     Photos:'', Updated:'2025-04-21T11:20:00Z', UpdatedBy:'Lars Nielsen' },
-  { CPO:'CPO-2025-0006', Name:'Steel Columns — CBD Office Tower Ørestad',
+  { PO:'25006', Name:'Steel Columns — CBD Office Tower Ørestad',
     Responsible:'Thomas Dahl', Email:'t.dahl@omkon.dk', Phone:'+45 29 87 65 43',
     KS_Tags:'KS-C, KS-D', Qty:'6800', Price:'16.20', Total:'110160',
     Pay1Paid:true, Pay2Paid:true, Pay3Paid:true,
@@ -561,7 +561,7 @@ const DEMO = [
     Pct:'100', OmkonNotes:'Delivered and installed.',
     CPHNotes:'Awaiting final invoice.',
     Photos:'', Updated:'2025-04-20T08:00:00Z', UpdatedBy:'Thomas Dahl' },
-  { CPO:'CPO-2025-0007', Name:'Fire Escape Staircase — Valby Factory',
+  { PO:'25007', Name:'Fire Escape Staircase — Valby Factory',
     Responsible:'Mette Christiansen', Email:'mette@cphsteel.dk', Phone:'+45 31 22 44 66',
     KS_Tags:'KS-B, KS-C', Qty:'1100', Price:'19.50', Total:'21450',
     Pay1Paid:true, Pay2Paid:false, Pay3Paid:false,
@@ -584,7 +584,7 @@ DEMO.forEach(p=>{
   if(p.CBAM_EmIndirect===undefined) p.CBAM_EmIndirect='';
   if(p.CBAM_Registered===undefined) p.CBAM_Registered=false;
 });
-DEMO.find(p=>p.CPO==='CPO-2025-0006').Archived=true;
+DEMO.find(p=>p.PO==='25006').Archived=true;
 
 const ST = {
   projects: CONFIGURED ? [] : DEMO.map(p=>({...p})),
@@ -595,7 +595,7 @@ const ST = {
   filterYear: localStorage.getItem('omkon_year')||'all',
   archiveOpen:false,
   cbamOpen: new Set(),
-  chatCPO: null,
+  chatPO: null,
 };
 
 function init() {
@@ -679,33 +679,32 @@ function fetchSheet() {
         hdrs.forEach((h,i)=>{const v=(row[i]??'').trim();p[h]=(v==='#ERROR!'||v==='#NAME?'||v==='#VALUE!')?'':v.replace(/^ /,'');});
         ['Qty','Price','Total','Pct','ExtraAmount'].forEach(f=>{if(p[f]) p[f]=normalizeDaNum(p[f]);});
         BOOL_FIELDS.forEach(f=>{p[f]=p[f]==='TRUE'||p[f]==='true'||p[f]===true;});
-        const ex=findP(p.CPO);
+        const ex=findP(p.PO);
         // If written within last 30s, keep local version — Apps Script may not have processed yet
-        if(ex && _recentWrites[p.CPO] && (Date.now()-_recentWrites[p.CPO])<30000) return ex;
+        if(ex && _recentWrites[p.PO] && (Date.now()-_recentWrites[p.PO])<30000) return ex;
         if(ex) {
           if(ex.Notes && !p.Notes) p.Notes=ex.Notes;
           if(ex.ExtraDesc  && !p.ExtraDesc)  p.ExtraDesc=ex.ExtraDesc;
           if(ex.ExtraAmount && !p.ExtraAmount) p.ExtraAmount=ex.ExtraAmount;
           if(p.ExtraAmount===undefined || p.ExtraAmount==='') p.ExtraPaid=ex.ExtraPaid||false;
         }
-        // Protect numeric edits for 2 min — survives slow Apps Script processing
-        // BUT: if another user changed this row (Updated differs), discard localStorage
+        // Restore any locally-edited fields — survives refresh before GAS lands.
+        // Covers ALL field types: numeric, boolean, text, notes.
+        // If another user changed the row (Updated timestamp differs), discard stale entries.
         let priceOrQtyRestored = false;
-        ['Qty','Price','Total','Pct'].forEach(f=>{
-          const saved=JSON.parse(localStorage.getItem('omkon_edit_'+p.CPO+'_'+f)||'null');
+        const editPrefix = 'omkon_edit_'+p.PO+'_';
+        Object.keys(localStorage).filter(k=>k.startsWith(editPrefix)).forEach(k=>{
+          const f = k.slice(editPrefix.length);
+          const saved=JSON.parse(localStorage.getItem(k)||'null');
           if(!saved) return;
-          // prevUpdated = Sheet timestamp at the moment we made our edit.
-          // If CSV now shows a DIFFERENT timestamp → another user changed the row → discard.
-          // If CSV still shows the same timestamp → our write hasn't landed yet → keep.
-          // If no prevUpdated (old entry) → fall through to 2-min timeout as before.
           const otherUserEdited = saved.prevUpdated !== undefined && p.Updated && saved.prevUpdated !== p.Updated;
           if(otherUserEdited) {
-            localStorage.removeItem('omkon_edit_'+p.CPO+'_'+f);
-          } else if((Date.now()-saved.ts)<120000) {
+            localStorage.removeItem(k);
+          } else if((Date.now()-saved.ts)<300000) {
             p[f]=saved.v;
             if(f==='Price'||f==='Qty') priceOrQtyRestored=true;
           } else {
-            localStorage.removeItem('omkon_edit_'+p.CPO+'_'+f);
+            localStorage.removeItem(k);
           }
         });
         // If Price or Qty came from localStorage, recalculate Total to stay consistent
@@ -715,7 +714,7 @@ function fetchSheet() {
           if(qty&&price) p.Total=(qty*price).toLocaleString('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2});
         }
         // Fallback: localStorage backup for Extra fields (survives page reload)
-        const lsKey='omkon_extra_'+p.CPO;
+        const lsKey='omkon_extra_'+p.PO;
         if(!p.ExtraAmount) {
           const saved=JSON.parse(localStorage.getItem(lsKey)||'null');
           if(saved){p.ExtraDesc=saved.d||'';p.ExtraAmount=saved.a||'';p.ExtraPaid=saved.p||false;}
@@ -728,12 +727,12 @@ function fetchSheet() {
       Object.keys(localStorage).filter(k=>k.startsWith('omkon_new_')).forEach(k=>{
         const saved=JSON.parse(localStorage.getItem(k)||'null');
         if(!saved) return;
-        if(Date.now()-saved.ts>120000){localStorage.removeItem(k);return;} // 2 min expiry
-        const csvIdx=projects.findIndex(p=>p.CPO===saved.proj.CPO);
+        if(Date.now()-saved.ts>300000){localStorage.removeItem(k);return;} // 5 min expiry
+        const csvIdx=projects.findIndex(p=>p.PO===saved.proj.PO);
         if(csvIdx<0) {
           projects.unshift(saved.proj); // not in CSV yet — inject fully
         } else {
-          // CPO is in CSV but may be incomplete — merge localStorage fields that are empty
+          // PO is in CSV but may be incomplete — merge localStorage fields that are empty
           const csvProj=projects[csvIdx];
           const landedInCSV=!!csvProj.Name; // check raw CSV state BEFORE merging localStorage
           Object.keys(saved.proj).forEach(f=>{ if(!csvProj[f] && saved.proj[f] !== undefined) csvProj[f]=saved.proj[f]; });
@@ -762,7 +761,7 @@ function parseCSV(text) {
 const _recentWrites={};
 function postRow(proj) {
   if(!CONFIGURED)return;
-  _recentWrites[proj.CPO]=Date.now();
+  _recentWrites[proj.PO]=Date.now();
   const payload={...proj};
   delete payload.Photos;
   delete payload.Files;
@@ -774,7 +773,7 @@ function postFields(cpo, fields) {
   if(!CONFIGURED)return;
   const p=findP(cpo); if(!p) return;
   _recentWrites[cpo]=Date.now();
-  const payload={CPO:cpo, Updated:p.Updated, UpdatedBy:p.UpdatedBy};
+  const payload={PO:cpo, Updated:p.Updated, UpdatedBy:p.UpdatedBy};
   fields.forEach(f=>{ if(p[f]!==undefined) payload[f]=p[f]; });
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
 }
@@ -797,7 +796,7 @@ function health(pct, dl) {
 function getVis() {
   let list=ST.projects.filter(p=>!p.Archived && projMatchesYear(p, ST.filterYear));
   const q=ST.searchQ.toLowerCase();
-  if(q) list=list.filter(p=>p.CPO.toLowerCase().includes(q)||p.Name.toLowerCase().includes(q)||p.Responsible.toLowerCase().includes(q));
+  if(q) list=list.filter(p=>p.PO.toLowerCase().includes(q)||p.Name.toLowerCase().includes(q)||p.Responsible.toLowerCase().includes(q));
   if(ST.filterHealth!=='all') list=list.filter(p=>health(p.Pct,p.Deadline)===ST.filterHealth);
   if(ST.filterPerson!=='all') list=list.filter(p=>p.Responsible===ST.filterPerson);
   list.sort((a,b)=>{
@@ -806,7 +805,7 @@ function getVis() {
       case 'deadline': return ((a.Deadline?new Date(a.Deadline):new Date('9999'))-(b.Deadline?new Date(b.Deadline):new Date('9999')))*d;
       case 'status': return ((parseFloat(a.Pct)||0)-(parseFloat(b.Pct)||0))*d;
       case 'name': return a.Name.localeCompare(b.Name)*d;
-      case 'cpo': return a.CPO.localeCompare(b.CPO)*d;
+      case 'cpo': return a.PO.localeCompare(b.PO)*d;
       default: return 0;
     }
   });
@@ -848,9 +847,9 @@ function renderAll() {
   }
   // Preserve any chat text the user is currently typing
   const savedChats={};
-  document.querySelectorAll('.chat-inp[data-cpo]').forEach(el=>{if(el.value)savedChats[el.dataset.cpo]=el.value;});
+  document.querySelectorAll('.chat-inp[data-po]').forEach(el=>{if(el.value)savedChats[el.dataset.po]=el.value;});
   area.innerHTML=html;
-  Object.keys(savedChats).forEach(cpo=>{const el=document.querySelector('.chat-inp[data-cpo="'+cpo+'"]');if(el)el.value=savedChats[cpo];});
+  Object.keys(savedChats).forEach(cpo=>{const el=document.querySelector('.chat-inp[data-po="'+cpo+'"]');if(el)el.value=savedChats[cpo];});
   if(document.getElementById('modal-cf')?.classList.contains('open')) renderCashFlow();
   // Restore open CBAM panels after DOM rebuild
   ST.cbamOpen.forEach(cpo => {
@@ -887,7 +886,7 @@ function calcStats() {
 }
 
 function tog(val, cpo, field) {
-  return `<span class="tog ${val?'yes':'no'}" data-cpo="${esc(cpo)}" data-field="${field}">${val?'✅ Yes':'🔴 No'}</span>`;
+  return `<span class="tog ${val?'yes':'no'}" data-po="${esc(cpo)}" data-field="${field}">${val?'✅ Yes':'🔴 No'}</span>`;
 }
 function togRO(val) {
   return `<span class="tog ${val?'yes':'no'}" style="pointer-events:none;opacity:.8">${val?'✅ Yes':'🔴 No'}</span>`;
@@ -913,19 +912,19 @@ function cardHTML(p, isArchived=false) {
   if(!p.CBAM_Registered) missing.push('CBAM not verified');
   const p3Class = !finalUnlocked ? 'locked' : (p.Pay3Paid ? 'paid' : 'due');
   const p3Icon  = !finalUnlocked ? '🔒' : (p.Pay3Paid ? '✅' : '🔴');
-  const p3Click = finalUnlocked && !isArchived && isCPH ? `data-cpo="${esc(p.CPO)}" data-pay="Pay3Paid" data-tip="Click to mark as paid"` : `data-tip="${finalUnlocked?'Only CPH Steel can release payment':'Payment locked — see conditions'}"`;
+  const p3Click = finalUnlocked && !isArchived && isCPH ? `data-po="${esc(p.PO)}" data-pay="Pay3Paid" data-tip="Click to mark as paid"` : `data-tip="${finalUnlocked?'Only CPH Steel can release payment':'Payment locked — see conditions'}"`;
 
 
-  return `<div class="proj-card ${h}" data-cpo="${esc(p.CPO)}">
+  return `<div class="proj-card ${h}" data-po="${esc(p.PO)}">
 
   <div class="pc-head">
-    <span class="pc-cpo">${p.PONumber?esc(p.PONumber):'—'}</span>
+    <span class="pc-cpo">PO ${esc(p.PO)}</span>
     <span class="pc-name">${esc(p.Name)}</span>
     <span class="pc-resp">${esc(p.Responsible)}</span>
     <div class="pc-tags">${tags}</div>
     <span class="health-pill ${h}" data-tip="${h==='RED'?'Critical — deadline near or passed':h==='YELLOW'?'Warning — deadline within 14 days':'On track'}"><span class="hpill-dot"></span>${h}</span>
-    ${isCPH && !isArchived ? `<button class="btn-archive" data-tip="Archive project" onclick="doArchive('${esc(p.CPO)}')">📦 Archive</button>` : ''}
-    ${isCPH && isArchived ? `<button class="btn-unarchive" data-tip="Reactivate project" onclick="doUnarchive('${esc(p.CPO)}')">↩ Reactivate</button>` : ''}
+    ${isCPH && !isArchived ? `<button class="btn-archive" data-tip="Archive project" onclick="doArchive('${esc(p.PO)}')">📦 Archive</button>` : ''}
+    ${isCPH && isArchived ? `<button class="btn-unarchive" data-tip="Reactivate project" onclick="doUnarchive('${esc(p.PO)}')">↩ Reactivate</button>` : ''}
   </div>
 
   <div class="pc-body">
@@ -934,45 +933,43 @@ function cardHTML(p, isArchived=false) {
     <div class="pcs">
       <div class="pcs-title">Timeline &amp; Contract</div>
       <div class="pf"><span class="pfl">Project start</span>
-        <span class="pfv ${p.Pay1Date?'conf':'muted'} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Sets down payment due date':'Project start = down payment due date'}">${fmtD(p.Pay1Date)||'—'}</span></div>
-      <div class="pf"><span class="pfl">PO nr.</span>
-        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="PONumber" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Customer purchase order reference':'Customer purchase order reference'}">${esc(p.PONumber)||'—'}</span></div>
+        <span class="pfv ${p.Pay1Date?'conf':'muted'} ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Pay1Date" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Sets down payment due date':'Project start = down payment due date'}">${fmtD(p.Pay1Date)||'—'}</span></div>
       <div class="pf"><span class="pfl">Shipping / deadline</span>
-        <span class="pfv ${dc} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Deadline" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Drives year grouping and health status':'Delivery deadline'}">${fmtD(p.Deadline)||'—'}</span></div>
+        <span class="pfv ${dc} ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Deadline" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Drives year grouping and health status':'Delivery deadline'}">${fmtD(p.Deadline)||'—'}</span></div>
       <div class="pf"><span class="pfl">Pickup date</span>
-        <span class="pfv ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pickup" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Sets 2nd payment due date + est. final date':'Pickup date — sets 2nd payment due date'}">${fmtD(p.Pickup)||'—'}</span></div>
+        <span class="pfv ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Pickup" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Sets 2nd payment due date + est. final date':'Pickup date — sets 2nd payment due date'}">${fmtD(p.Pickup)||'—'}</span></div>
       <div class="pf" data-tip="${isCPH?'Toggle when Omkon confirms pickup is ready':'Read only — set by CPH Steel'}"><span class="pfl">Pickup confirmed</span>
-        ${isCPH?tog(p.PickupConfirmed, p.CPO, 'PickupConfirmed'):togRO(p.PickupConfirmed)}</div>
+        ${isCPH?tog(p.PickupConfirmed, p.PO, 'PickupConfirmed'):togRO(p.PickupConfirmed)}</div>
       <div style="border-top:1px dashed var(--g200);margin:8px 0"></div>
       <div class="pf"><span class="pfl">Responsible</span>
-        <span class="pfv ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Responsible" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Omkon contact person':'Project contact at Omkon'}">${esc(p.Responsible)}</span></div>
+        <span class="pfv ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Responsible" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Omkon contact person':'Project contact at Omkon'}">${esc(p.Responsible)}</span></div>
       <div class="pf"><span class="pfl">Email</span>
-        <span class="pfv muted ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Email" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Click address to open mail client':'Click address to send email'}">${p.Email?`<a href="mailto:${esc(p.Email)}" style="color:inherit;text-decoration:underline" onclick="event.stopPropagation()">${esc(p.Email)}</a>`:'—'}</span></div>
+        <span class="pfv muted ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Email" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Click address to open mail client':'Click address to send email'}">${p.Email?`<a href="mailto:${esc(p.Email)}" style="color:inherit;text-decoration:underline" onclick="event.stopPropagation()">${esc(p.Email)}</a>`:'—'}</span></div>
       <div class="pf"><span class="pfl">Phone</span>
-        <span class="pfv muted ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Phone" data-t="text"`:''} data-tip="${isCPH?'Click to edit':'Contact phone number'}">${esc(p.Phone)||'—'}</span></div>
+        <span class="pfv muted ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Phone" data-t="text"`:''} data-tip="${isCPH?'Click to edit':'Contact phone number'}">${esc(p.Phone)||'—'}</span></div>
     </div>
 
     <!-- 2: PRICING & PROGRESS -->
     <div class="pcs">
       <div class="pcs-title">Pricing &amp; Progress</div>
       <div class="pf"><span class="pfl">Total</span>
-        <span class="pfv eur ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Total" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Contract value ex. VAT':'Contract value — set by CPH Steel'}">€ ${fmtEur(total)||'—'}</span></div>
+        <span class="pfv eur ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Total" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Contract value ex. VAT':'Contract value — set by CPH Steel'}">€ ${fmtEur(total)||'—'}</span></div>
       ${parseFloat(p.ExtraAmount)>0?`
       <div class="pf" style="opacity:.75"><span class="pfl" style="font-style:italic">${esc(p.ExtraDesc||'Extra services')}</span>
         <span class="pfv eur" style="font-style:italic">€ ${fmtEur(p.ExtraAmount)}</span></div>
       <div class="pf" style="border-top:1px solid rgba(0,0,0,.1);margin-top:4px;padding-top:4px"><span class="pfl" style="font-weight:700">Grand total</span>
         <span class="pfv eur" style="font-weight:700">€ ${fmtEur(total+(parseFloat(p.ExtraAmount)||0))}</span></div>`:''}
       <div class="pf"><span class="pfl">Quantity (kg)</span>
-        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Qty" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Weight of steel delivered':'Total steel weight in kg'}">${fmt(p.Qty)||'—'}</span></div>
+        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Qty" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Weight of steel delivered':'Total steel weight in kg'}">${fmt(p.Qty)||'—'}</span></div>
       <div class="pf"><span class="pfl">Price / kg</span>
-        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Price" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Unit price per kg':'Unit price per kg — set by CPH Steel'}">€ ${p.Price?fmtEur(p.Price):'—'}</span></div>
+        <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Price" data-t="number"`:''} data-tip="${isCPH?'Click to edit · Unit price per kg':'Unit price per kg — set by CPH Steel'}">€ ${p.Price?fmtEur(p.Price):'—'}</span></div>
       <div style="margin-top:12px">
         <div class="prog-row">
           <span class="pfl" data-tip="${isCPH?'Drag slider to update':'Omkon updates production progress'}">Production progress</span>
-          <span class="prog-pct" data-cpo="${esc(p.CPO)}">${pct}%</span>
+          <span class="prog-pct" data-po="${esc(p.PO)}">${pct}%</span>
         </div>
-        <div class="prog-bar"><div class="prog-fill ${pc}" style="width:${pct}%" data-cpo="${esc(p.CPO)}"></div></div>
-        <input type="range" class="prog-slider" value="${pct}" min="0" max="100" data-cpo="${esc(p.CPO)}" ${isCPH?'disabled style="opacity:.4;cursor:not-allowed"':''} />
+        <div class="prog-bar"><div class="prog-fill ${pc}" style="width:${pct}%" data-po="${esc(p.PO)}"></div></div>
+        <input type="range" class="prog-slider" value="${pct}" min="0" max="100" data-po="${esc(p.PO)}" ${isCPH?'disabled style="opacity:.4;cursor:not-allowed"':''} />
       </div>
     </div>
 
@@ -980,43 +977,43 @@ function cardHTML(p, isArchived=false) {
     <div class="pcs">
       <div class="pcs-title">Payment Plan</div>
 
-      <div class="pay-pill ${p.Pay1Paid?'paid':'due'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-pay="Pay1Paid" data-tip="Click to mark as paid / unpaid"':''} style="${isCPH?'':'cursor:default'}">
+      <div class="pay-pill ${p.Pay1Paid?'paid':'due'}" ${isCPH?'data-po="'+esc(p.PO)+'" data-pay="Pay1Paid" data-tip="Click to mark as paid / unpaid"':''} style="${isCPH?'':'cursor:default'}">
         <span class="pi">${p.Pay1Paid?'✅':'🔴'}</span>
         <span class="plabel">Down payment (30%)</span>
         <span class="pamt">€ ${fmtEur(total*.30)}</span>
       </div>
       <div class="pay-date-row">
         <span class="pay-date-label">Project start:</span>
-        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pay1Date" data-t="date"':''} data-tip="${isCPH?'Click to edit · Down payment due date':'Down payment due date'}">${fmtD(p.Pay1Date)||'Date not set'}</span>
+        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-po="'+esc(p.PO)+'" data-f="Pay1Date" data-t="date"':''} data-tip="${isCPH?'Click to edit · Down payment due date':'Down payment due date'}">${fmtD(p.Pay1Date)||'Date not set'}</span>
       </div>
 
       ${parseFloat(p.ExtraAmount)>0?`
-      <div class="pay-pill ${p.ExtraPaid?'paid':'due'}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-pay="ExtraPaid" data-tip="Click to mark as paid / unpaid"`:'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
+      <div class="pay-pill ${p.ExtraPaid?'paid':'due'}" ${isCPH?`data-po="${esc(p.PO)}" data-pay="ExtraPaid" data-tip="Click to mark as paid / unpaid"`:'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
         <span class="pi">${p.ExtraPaid?'✅':'🔴'}</span>
-        <span class="plabel ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="ExtraDesc" data-t="text" data-tip="Click to edit description"`:''} style="flex:1">${esc(p.ExtraDesc||'Extra services')}</span>
-        <span class="pamt ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="ExtraAmount" data-t="number" data-tip="Click to edit amount"`:''}>€ ${fmtEur(p.ExtraAmount)}</span>
+        <span class="plabel ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="ExtraDesc" data-t="text" data-tip="Click to edit description"`:''} style="flex:1">${esc(p.ExtraDesc||'Extra services')}</span>
+        <span class="pamt ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="ExtraAmount" data-t="number" data-tip="Click to edit amount"`:''}>€ ${fmtEur(p.ExtraAmount)}</span>
       </div>
       <div class="pay-date-row">
         <span class="pay-date-label">Due:</span>
-        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''}  data-tip="Extra services — same date as down payment">${fmtD(p.Pay1Date)||'Date not set'}</span>
+        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?`data-po="${esc(p.PO)}" data-f="Pay1Date" data-t="date"`:''}  data-tip="Extra services — same date as down payment">${fmtD(p.Pay1Date)||'Date not set'}</span>
       </div>`
       :isCPH?`<div style="padding:4px 0 6px">
         <div style="font-size:10px;color:var(--steel);opacity:.6;margin-bottom:4px;font-family:var(--fh);text-transform:uppercase;letter-spacing:.05em">＋ Extra services</div>
         <div style="display:flex;gap:5px;align-items:center">
-          <input id="xd-${esc(p.CPO)}" placeholder="Description" value="${esc(p.ExtraDesc||'')}" style="flex:1;font-size:11px;padding:4px 7px;border:1px solid var(--g200);border-radius:4px;font-family:var(--fb);color:var(--coal);background:#fff;min-width:0"/>
-          <input id="xa-${esc(p.CPO)}" type="number" placeholder="€ 0.00" min="0" step="0.01" style="width:80px;font-size:11px;padding:4px 7px;border:1px solid var(--g200);border-radius:4px;font-family:var(--fb);color:var(--coal);background:#fff"/>
-          <button onclick="saveExtra('${esc(p.CPO)}')" style="padding:4px 9px;font-size:11px;background:var(--coal);color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:var(--fh);letter-spacing:.04em">Save</button>
+          <input id="xd-${esc(p.PO)}" placeholder="Description" value="${esc(p.ExtraDesc||'')}" style="flex:1;font-size:11px;padding:4px 7px;border:1px solid var(--g200);border-radius:4px;font-family:var(--fb);color:var(--coal);background:#fff;min-width:0"/>
+          <input id="xa-${esc(p.PO)}" type="number" placeholder="€ 0.00" min="0" step="0.01" style="width:80px;font-size:11px;padding:4px 7px;border:1px solid var(--g200);border-radius:4px;font-family:var(--fb);color:var(--coal);background:#fff"/>
+          <button onclick="saveExtra('${esc(p.PO)}')" style="padding:4px 9px;font-size:11px;background:var(--coal);color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:var(--fh);letter-spacing:.04em">Save</button>
         </div>
       </div>`:''}
 
-      <div class="pay-pill ${p.Pay2Paid?'paid':'due'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-pay="Pay2Paid" data-tip="Click to mark as paid / unpaid"':'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
+      <div class="pay-pill ${p.Pay2Paid?'paid':'due'}" ${isCPH?'data-po="'+esc(p.PO)+'" data-pay="Pay2Paid" data-tip="Click to mark as paid / unpaid"':'data-tip="Set by CPH Steel"'} style="${isCPH?'':'cursor:default'}">
         <span class="pi">${p.Pay2Paid?'✅':'🔴'}</span>
         <span class="plabel">2nd payment (50%)</span>
         <span class="pamt">€ ${fmtEur(total*.50)}</span>
       </div>
       <div class="pay-date-row">
         <span class="pay-date-label">Pick up:</span>
-        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pickup" data-t="date"':''} data-tip="${isCPH?'Click to edit · 2nd payment due at pickup':'2nd payment is due at pickup date'}">${fmtD(p.Pickup)||'Date not set'}</span>
+        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-po="'+esc(p.PO)+'" data-f="Pickup" data-t="date"':''} data-tip="${isCPH?'Click to edit · 2nd payment due at pickup':'2nd payment is due at pickup date'}">${fmtD(p.Pickup)||'Date not set'}</span>
       </div>
 
       <div class="pay-pill ${p3Class}" ${p3Click}>
@@ -1026,7 +1023,7 @@ function cardHTML(p, isArchived=false) {
       </div>
       <div class="pay-date-row">
         <span class="pay-date-label">Shipping:</span>
-        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="Pay3Date" data-t="date"':''} data-tip="${isCPH?'Click to set confirmed date · Default = Pickup + 30 days':'Final payment date · Default = Pickup + 30 days'}">${cleanDate(p.Pay3Date)?fmtD(p.Pay3Date):(p.Pickup?fmtD(addDays(p.Pickup,30))+' <span style="opacity:.6;font-size:10px">(est.)</span>':'Date not set')}</span>
+        <span class="pay-date-val ${isCPH?'ed':''}" ${isCPH?'data-po="'+esc(p.PO)+'" data-f="Pay3Date" data-t="date"':''} data-tip="${isCPH?'Click to set confirmed date · Default = Pickup + 30 days':'Final payment date · Default = Pickup + 30 days'}">${cleanDate(p.Pay3Date)?fmtD(p.Pay3Date):(p.Pickup?fmtD(addDays(p.Pickup,30))+' <span style="opacity:.6;font-size:10px">(est.)</span>':'Date not set')}</span>
       </div>
       ${!finalUnlocked && missing.length ? `<div class="pay-lock-info">🔒 Pending: ${missing.join(' · ')}</div>` : ''}
       ${finalUnlocked && !p.Pay3Paid ? `<div style="font-size:10px;color:var(--green);padding:2px 4px 6px">✅ All conditions met — payment can be released</div>` : ''}
@@ -1036,26 +1033,26 @@ function cardHTML(p, isArchived=false) {
     <div class="pcs">
       <div class="pcs-title">KS &amp; Delivery</div>
       <div class="pf"><span class="pfl">KS Tags</span>
-        <span class="pfv ${isCPH?'ed':''}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="KS_Tags" data-t="text"':''} data-tip="${isCPH?'Click to edit · Internal QA reference tags':'Internal QA reference tags'}">${esc(p.KS_Tags)||'—'}</span></div>
+        <span class="pfv ${isCPH?'ed':''}" ${isCPH?'data-po="'+esc(p.PO)+'" data-f="KS_Tags" data-t="text"':''} data-tip="${isCPH?'Click to edit · Internal QA reference tags':'Internal QA reference tags'}">${esc(p.KS_Tags)||'—'}</span></div>
       <div style="margin-top:8px">
-        <div class="pf" data-tip="${isCPH?'Toggle when KS documentation is received from Omkon':'Read only — set by CPH Steel'}"><span class="pfl">KS doc. received</span>${isCPH?tog(p.KS_DocReceived, p.CPO, 'KS_DocReceived'):togRO(p.KS_DocReceived)}</div>
-        <div class="pf" data-tip="${isCPH?'Toggle when KS documentation is approved internally':'Read only — set by CPH Steel'}"><span class="pfl">KS doc. approved</span>${isCPH?tog(p.KS_DocApproved, p.CPO, 'KS_DocApproved'):togRO(p.KS_DocApproved)}</div>
+        <div class="pf" data-tip="${isCPH?'Toggle when KS documentation is received from Omkon':'Read only — set by CPH Steel'}"><span class="pfl">KS doc. received</span>${isCPH?tog(p.KS_DocReceived, p.PO, 'KS_DocReceived'):togRO(p.KS_DocReceived)}</div>
+        <div class="pf" data-tip="${isCPH?'Toggle when KS documentation is approved internally':'Read only — set by CPH Steel'}"><span class="pfl">KS doc. approved</span>${isCPH?tog(p.KS_DocApproved, p.PO, 'KS_DocApproved'):togRO(p.KS_DocApproved)}</div>
         <div class="pfl" style="margin-top:6px;margin-bottom:3px" data-tip="${isCPH?'Click to add/edit QA remarks':'Read only — set by CPH Steel'}">KS Remarks</div>
-        <div class="rem-area ${isCPH?'ed':''} ${p.KS_Remarks?'':'empty'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="KS_Remarks" data-t="textarea"':''}>${esc(p.KS_Remarks)||'No remarks…'}</div>
+        <div class="rem-area ${isCPH?'ed':''} ${p.KS_Remarks?'':'empty'}" ${isCPH?'data-po="'+esc(p.PO)+'" data-f="KS_Remarks" data-t="textarea"':''}>${esc(p.KS_Remarks)||'No remarks…'}</div>
       </div>
       <hr class="ks-divider"/>
       <div class="ks-sub-title">After Delivery</div>
-      <div class="pf" data-tip="${isCPH?'Toggle when goods are physically received at CPH Steel':'Read only — set by CPH Steel'}"><span class="pfl">Goods received</span>${isCPH?tog(p.GoodsReceived, p.CPO, 'GoodsReceived'):togRO(p.GoodsReceived)}</div>
-      <div class="pf" data-tip="${isCPH?'Toggle when delivery is formally approved':'Read only — set by CPH Steel'}"><span class="pfl">Delivery approved</span>${isCPH?tog(p.DeliveryApproved, p.CPO, 'DeliveryApproved'):togRO(p.DeliveryApproved)}</div>
+      <div class="pf" data-tip="${isCPH?'Toggle when goods are physically received at CPH Steel':'Read only — set by CPH Steel'}"><span class="pfl">Goods received</span>${isCPH?tog(p.GoodsReceived, p.PO, 'GoodsReceived'):togRO(p.GoodsReceived)}</div>
+      <div class="pf" data-tip="${isCPH?'Toggle when delivery is formally approved':'Read only — set by CPH Steel'}"><span class="pfl">Delivery approved</span>${isCPH?tog(p.DeliveryApproved, p.PO, 'DeliveryApproved'):togRO(p.DeliveryApproved)}</div>
       <div class="pfl" style="margin-top:6px;margin-bottom:3px" data-tip="${isCPH?'Click to add/edit delivery remarks':'Read only — set by CPH Steel'}">Delivery remarks</div>
-      <div class="rem-area ${isCPH?'ed':''} ${p.DeliveryRemarks?'':'empty'}" ${isCPH?'data-cpo="'+esc(p.CPO)+'" data-f="DeliveryRemarks" data-t="textarea"':''}>${esc(p.DeliveryRemarks)||'No remarks…'}</div>
+      <div class="rem-area ${isCPH?'ed':''} ${p.DeliveryRemarks?'':'empty'}" ${isCPH?'data-po="'+esc(p.PO)+'" data-f="DeliveryRemarks" data-t="textarea"':''}>${esc(p.DeliveryRemarks)||'No remarks…'}</div>
     </div>
 
   </div><!-- /pc-body -->
 
   <!-- MESSAGES BUTTON -->
   <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--g200)" data-tip="Open shared message thread — visible to both CPH Steel and Omkon">
-    <button class="btn-chat" data-cpo="${esc(p.CPO)}" onclick="openChat('${esc(p.CPO)}')">${(()=>{const bad=['false','true'];const vl=s=>s&&!bad.includes(s.trim().toLowerCase());const n=parseNotes(p.Notes).filter(m=>m.t&&m.t.trim()&&!bad.includes(m.t.trim().toLowerCase())).length||(vl(p.OmkonNotes)?1:0)+(vl(p.CPHNotes)?1:0);return '💬 '+(n?'Messages ('+n+')':'Start conversation');})()}</button>
+    <button class="btn-chat" data-po="${esc(p.PO)}" onclick="openChat('${esc(p.PO)}')">${(()=>{const bad=['false','true'];const vl=s=>s&&!bad.includes(s.trim().toLowerCase());const n=parseNotes(p.Notes).filter(m=>m.t&&m.t.trim()&&!bad.includes(m.t.trim().toLowerCase())).length||(vl(p.OmkonNotes)?1:0)+(vl(p.CPHNotes)?1:0);return '💬 '+(n?'Messages ('+n+')':'Start conversation');})()}</button>
   </div>
 
   <!-- CBAM -->
@@ -1063,11 +1060,11 @@ function cardHTML(p, isArchived=false) {
     <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);margin-bottom:2px">CBAM</div>
     <div class="pf" data-tip="${isCPH?'Read only — Omkon confirms supplier data is submitted':'Click to confirm CBAM_Supplier_Form has been sent to CPH Steel'}">
       <span class="pfl">Data submitted (Omkon)</span>
-      ${!isCPH ? tog(p.CBAM_Submitted, p.CPO, 'CBAM_Submitted') : togRO(p.CBAM_Submitted)}
+      ${!isCPH ? tog(p.CBAM_Submitted, p.PO, 'CBAM_Submitted') : togRO(p.CBAM_Submitted)}
     </div>
     <div class="pf" data-tip="${isCPH?'Toggle when CBAM_Supplier_Form is received and verified · Required to unlock final payment':'Read only — CPH Steel verifies supplier data · Required before final payment'}">
       <span class="pfl">Verified by CPH Steel</span>
-      ${isCPH ? tog(p.CBAM_Registered, p.CPO, 'CBAM_Registered') : togRO(p.CBAM_Registered)}
+      ${isCPH ? tog(p.CBAM_Registered, p.PO, 'CBAM_Registered') : togRO(p.CBAM_Registered)}
     </div>
   </div>
 
@@ -1146,11 +1143,11 @@ function renderCashFlow() {
     if(!p.KS_DocReceived) missing.push('KS doc. received');
     if(!p.KS_DocApproved) missing.push('KS doc. approved');
     if(!p.CBAM_Registered) missing.push('CBAM not verified');
-    entries.push({cpo:p.CPO, name:p.Name, label:'Down payment (30%)', sub:'Project start', amount:t*.30, date:d1, paid:p.Pay1Paid, locked:false, est:false, missing:[], sortDate:d1||'9999'});
+    entries.push({cpo:p.PO, name:p.Name, label:'Down payment (30%)', sub:'Project start', amount:t*.30, date:d1, paid:p.Pay1Paid, locked:false, est:false, missing:[], sortDate:d1||'9999'});
     const ex=parseFloat(p.ExtraAmount)||0;
-    if(ex>0) entries.push({cpo:p.CPO, name:p.Name, label:p.ExtraDesc||'Extra services', sub:'Additional service', amount:ex, date:d1, paid:p.ExtraPaid, locked:false, est:false, missing:[], sortDate:d1||'9999'});
-    entries.push({cpo:p.CPO, name:p.Name, label:'2nd payment (50%)', sub:'At pickup', amount:t*.50, date:d2, paid:p.Pay2Paid, locked:false, est:false, missing:[], sortDate:d2||'9999'});
-    entries.push({cpo:p.CPO, name:p.Name, label:'Final payment (20%)', sub:'Pickup +30 days', amount:t*.20, date:d3raw, paid:p.Pay3Paid, locked:!fu, est:d3est, missing, sortDate:d3raw||'9999'});
+    if(ex>0) entries.push({cpo:p.PO, name:p.Name, label:p.ExtraDesc||'Extra services', sub:'Additional service', amount:ex, date:d1, paid:p.ExtraPaid, locked:false, est:false, missing:[], sortDate:d1||'9999'});
+    entries.push({cpo:p.PO, name:p.Name, label:'2nd payment (50%)', sub:'At pickup', amount:t*.50, date:d2, paid:p.Pay2Paid, locked:false, est:false, missing:[], sortDate:d2||'9999'});
+    entries.push({cpo:p.PO, name:p.Name, label:'Final payment (20%)', sub:'Pickup +30 days', amount:t*.20, date:d3raw, paid:p.Pay3Paid, locked:!fu, est:d3est, missing, sortDate:d3raw||'9999'});
   });
 
   entries.sort((a,b) => a.sortDate.localeCompare(b.sortDate));
@@ -1164,7 +1161,7 @@ function renderCashFlow() {
 
   let html = `<div class="cf-wrap"><table class="cf-table">
     <thead><tr>
-      <th>CPO</th><th>Project</th><th>Payment</th>
+      <th>PO</th><th>Project</th><th>Payment</th>
       <th style="text-align:right">Amount</th><th>Due date</th><th>Status</th>
     </tr></thead><tbody>`;
 
@@ -1221,7 +1218,7 @@ function exportExcel() {
   const open = ST.projects.filter(p=>!p.Archived);
 
   // Sheet 1: Cash Flow
-  const cfHeaders = ['CPO','PO / Order No.','Project','Responsible','Payment','Amount (EUR)','Due date','Est.','Paid','Final approved'];
+  const cfHeaders = ['PO','Project','Responsible','Payment','Amount (EUR)','Due date','Est.','Paid','Final approved'];
   const cfRows = [cfHeaders];
   open.forEach(p=>{
     const t=parseFloat(p.Total)||0;
@@ -1229,11 +1226,11 @@ function exportExcel() {
     const d1=cleanDate(p.Pay1Date)||'';
     const d2=cleanDate(p.Pickup)||'';
     const d3=finalDate(p)||'';
-    cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'Down payment (30%)',+(t*.30).toFixed(2),d1,'No',p.Pay1Paid?'Yes':'No','']);
+    cfRows.push([p.PO,p.Name,p.Responsible,'Down payment (30%)',+(t*.30).toFixed(2),d1,'No',p.Pay1Paid?'Yes':'No','']);
     const ex=parseFloat(p.ExtraAmount)||0;
-    if(ex>0) cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,p.ExtraDesc||'Extra services',+ex.toFixed(2),d1,'No',p.ExtraPaid?'Yes':'No','']);
-    cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'2nd payment (50%)',+(t*.50).toFixed(2),d2,'No',p.Pay2Paid?'Yes':'No','']);
-    cfRows.push([p.CPO,p.PONumber||'',p.Name,p.Responsible,'Final payment (20%)',+(t*.20).toFixed(2),d3,!cleanDate(p.Pay3Date)&&!!d3?'Yes':'No',p.Pay3Paid?'Yes':'No',fu?'Yes':'No']);
+    if(ex>0) cfRows.push([p.PO,p.Name,p.Responsible,p.ExtraDesc||'Extra services',+ex.toFixed(2),d1,'No',p.ExtraPaid?'Yes':'No','']);
+    cfRows.push([p.PO,p.Name,p.Responsible,'2nd payment (50%)',+(t*.50).toFixed(2),d2,'No',p.Pay2Paid?'Yes':'No','']);
+    cfRows.push([p.PO,p.Name,p.Responsible,'Final payment (20%)',+(t*.20).toFixed(2),d3,!cleanDate(p.Pay3Date)&&!!d3?'Yes':'No',p.Pay3Paid?'Yes':'No',fu?'Yes':'No']);
   });
   // Summary block
   const todayD = new Date(); todayD.setHours(0,0,0,0);
@@ -1271,11 +1268,11 @@ function exportExcel() {
   }
 
   // Sheet 2: Projects overview
-  const prHeaders = ['CPO','PO nr.','Project','Responsible','Deadline','Pickup','Total (EUR)','Qty (kg)','Progress %','Pay 1','Pay 2','Pay 3','Goods rcv.','Delivery appr.','KS doc rcv.','KS doc appr.','CBAM submitted','CBAM verified'];
+  const prHeaders = ['PO','Project','Responsible','Deadline','Pickup','Total (EUR)','Qty (kg)','Progress %','Pay 1','Pay 2','Pay 3','Goods rcv.','Delivery appr.','KS doc rcv.','KS doc appr.','CBAM submitted','CBAM verified'];
   const prRows = [prHeaders];
   open.forEach(p=>{
     prRows.push([
-      p.CPO, p.PONumber||'', p.Name, p.Responsible,
+      p.PO, p.Name, p.Responsible,
       cleanDate(p.Deadline)||'', cleanDate(p.Pickup)||'',
       +(parseFloat(p.Total)||0).toFixed(2),
       +(parseFloat(p.Qty)||0),
@@ -1310,31 +1307,31 @@ function bindEvents() {
   const area=document.getElementById('main-area');
   area.addEventListener('click', e => {
     const tog=e.target.closest('.tog[data-field]');
-    if(tog) { doToggle(tog.dataset.cpo, tog.dataset.field); return; }
+    if(tog) { doToggle(tog.dataset.po, tog.dataset.field); return; }
     const pay=e.target.closest('.pay-pill[data-pay]');
-    if(pay) { doToggle(pay.dataset.cpo, pay.dataset.pay); return; }
+    if(pay) { doToggle(pay.dataset.po, pay.dataset.pay); return; }
     if(e.target.type==='range') return;
     const ed=e.target.closest('.ed');
     if(!ed||activeEl===ed) return;
-    if(ed.dataset.cpo && ed.dataset.f) startEdit(ed, ed.dataset.cpo, ed.dataset.f, ed.dataset.t);
+    if(ed.dataset.po && ed.dataset.f) startEdit(ed, ed.dataset.po, ed.dataset.f, ed.dataset.t);
   });
   area.addEventListener('input', e => {
     if(e.target.type!=='range') return;
-    const cpo=e.target.dataset.cpo, v=e.target.value, n=parseInt(v);
+    const cpo=e.target.dataset.po, v=e.target.value, n=parseInt(v);
     const card=e.target.closest('.proj-card');
-    card.querySelector(`.prog-pct[data-cpo="${cpo}"]`).textContent=v+'%';
-    const fill=card.querySelector(`.prog-fill[data-cpo="${cpo}"]`);
+    card.querySelector(`.prog-pct[data-po="${cpo}"]`).textContent=v+'%';
+    const fill=card.querySelector(`.prog-fill[data-po="${cpo}"]`);
     fill.style.width=v+'%'; fill.className='prog-fill '+(n>=70?'hi':n>=40?'md':'lo');
   });
   area.addEventListener('change', e => {
     if(e.target.type!=='range') return;
-    const p=findP(e.target.dataset.cpo); if(!p) return;
+    const p=findP(e.target.dataset.po); if(!p) return;
     p.Pct=e.target.value; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
     const card=e.target.closest('.proj-card'), h=health(p.Pct,p.Deadline);
     card.className='proj-card '+h;
     const badge=card.querySelector('.health-pill');
     badge.className='health-pill '+h; badge.innerHTML=`<span class="hpill-dot"></span>${h}`;
-    postFields(p.CPO,['Pct']); toast('Progress → '+e.target.value+'%','success');
+    postFields(p.PO,['Pct']); toast('Progress → '+e.target.value+'%','success');
   });
   document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
     if(e.target!==o) return;
@@ -1374,6 +1371,7 @@ const CHANGE_NOTE_FIELDS = {
 };
 function doToggle(cpo, field) {
   const p=findP(cpo); if(!p) return;
+  const prevUpdated=p.Updated;
   p[field]=!p[field]; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
   if(CHANGE_NOTE_FIELDS[field]) {
     const who = ST.userName || (ST.role==='cphsteel'?'CPH Steel':'Omkon');
@@ -1386,6 +1384,8 @@ function doToggle(cpo, field) {
   }
   const toggleFields=[field];
   if(CHANGE_NOTE_FIELDS[field]) toggleFields.push('ChangeNote','Notes');
+  // Persist ALL toggled fields in localStorage — survives refresh before GAS processes the write
+  toggleFields.forEach(f=>localStorage.setItem('omkon_edit_'+cpo+'_'+f, JSON.stringify({v:p[f],ts:Date.now(),prevUpdated})));
   postFields(cpo,toggleFields); renderAll();
   const label = field.replace(/([A-Z])/g,' $1').trim();
   toast(label+': '+(p[field]?'Yes ✅':'No 🔴'), p[field]?'success':'warning');
@@ -1426,12 +1426,9 @@ function commitEdit(el, cpo, field, value) {
   if((field==='Qty'||field==='Price')&&p.Qty&&p.Price) p.Total=String((parseFloat(p.Qty)*parseFloat(p.Price)).toFixed(2));
   if(field==='OmkonNotes') p.OmkonNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
   if(field==='CPHNotes') p.CPHNotesBy=(ST.userName||ST.role)+' · '+fmtShort();
-  // Persist numeric edits in localStorage — protects against slow Apps Script
-  // prevUpdated = timestamp BEFORE our edit: if Sheet shows a different timestamp later,
-  // another user changed the row → discard. If Sheet still shows prevUpdated, our write
-  // hasn't landed yet → keep localStorage value.
-  if(['Qty','Price','Total','Pct'].includes(field))
-    localStorage.setItem('omkon_edit_'+cpo+'_'+field, JSON.stringify({v, ts:Date.now(), prevUpdated}));
+  // Persist edit in localStorage — survives refresh before GAS processes the write.
+  // prevUpdated: if Sheet later shows a different timestamp, another user edited → discard.
+  localStorage.setItem('omkon_edit_'+cpo+'_'+field, JSON.stringify({v, ts:Date.now(), prevUpdated}));
   // Only send the changed field (+ Total if recalculated, + note author if applicable)
   const sendFields=[field];
   if((field==='Qty'||field==='Price')&&p.Total) sendFields.push('Total');
@@ -1460,14 +1457,14 @@ function closeCreate() { document.getElementById('modal-create').classList.remov
 function submitCreate(e) {
   e.preventDefault();
   const fd=new FormData(e.target), g=k=>fd.get(k)||'';
-  const yr=new Date().getFullYear();
-  // Include localStorage-pending new projects to avoid CPO collision between users
-  const lsCPOs=Object.keys(localStorage).filter(k=>k.startsWith('omkon_new_CPO-'+yr+'-')).map(k=>k.replace('omkon_new_',''));
-  const nums=[...ST.projects.map(p=>p.CPO),...lsCPOs].filter(c=>c.startsWith('CPO-'+yr+'-')).map(c=>parseInt(c.split('-')[2])||0);
-  const cpo='CPO-'+yr+'-'+(Math.max(0,...nums)+1).toString().padStart(4,'0');
+  const po=g('po_number').trim();
+  if(!po){toast('PO number is required','warning'); return;}
+  // Reject duplicate PO (in-memory or pending localStorage create)
+  if(ST.projects.some(p=>String(p.PO).trim()===po)){toast('PO '+po+' already exists','warning'); return;}
+  if(localStorage.getItem('omkon_new_'+po)){toast('PO '+po+' is pending sync — try again','warning'); return;}
   const q=parseFloat(g('qty'))||0, pr=parseFloat(g('price'))||0;
   const proj={
-    CPO:cpo, PONumber:g('po_number'), Name:g('name'), Responsible:g('responsible'), Email:g('email'), Phone:g('phone'),
+    PO:po, Name:g('name'), Responsible:g('responsible'), Email:g('email'), Phone:g('phone'),
     KS_Tags:g('ks_tags'), Qty:g('qty'), Price:g('price'), Total:q&&pr?String((q*pr).toFixed(2)):'',
     ExtraDesc:g('extra_desc'), ExtraAmount:g('extra_amount')||'', ExtraPaid:false,
     Pay1Paid:false, Pay2Paid:false, Pay3Paid:false,
@@ -1481,10 +1478,10 @@ function submitCreate(e) {
     OmkonNotes:'', OmkonNotesBy:'', CPHNotes:'', CPHNotesBy:'',
     Updated:now(), UpdatedBy:ST.userName||ST.role, Archived:false,
   };
-  // Persist new project in localStorage for 2 min — survives page reload before Apps Script lands
-  localStorage.setItem('omkon_new_'+cpo, JSON.stringify({proj, ts:Date.now()}));
+  // Persist new project in localStorage — survives reload before GAS write lands
+  localStorage.setItem('omkon_new_'+po, JSON.stringify({proj, ts:Date.now()}));
   ST.projects.unshift(proj); postRow(proj); closeCreate(); renderYearTabs(); renderAll(); rebuildPersonFilter();
-  toast('Project '+cpo+' created','success');
+  toast('Project '+po+' created','success');
 }
 
 // ROLE
@@ -1527,7 +1524,7 @@ function toast(msg,type='info') {
 }
 
 // UTILS
-function findP(cpo) { return ST.projects.find(p=>p.CPO===cpo); }
+function findP(cpo) { return ST.projects.find(p=>p.PO===cpo); }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function fmtD(s) { if(!s) return ''; const d=new Date(s); return isNaN(d)?s:d.toLocaleDateString('da-DK',{day:'2-digit',month:'short',year:'numeric'}); }
 function addDays(dateStr, days) {
@@ -1561,26 +1558,26 @@ function now() { return new Date().toISOString(); }
 function fmtShort() { return new Date().toLocaleDateString('da-DK',{day:'2-digit',month:'short',year:'2-digit'}); }
 
 function openChat(cpo) {
-  ST.chatCPO=cpo; renderChat();
+  ST.chatPO=cpo; renderChat();
   document.getElementById('modal-chat').classList.add('open');
   setTimeout(()=>{
     const t=document.getElementById('chat-thread-modal'); if(t) t.scrollTop=t.scrollHeight;
     document.getElementById('chat-modal-inp')?.focus();
   },60);
 }
-function closeChat() { document.getElementById('modal-chat').classList.remove('open'); ST.chatCPO=null; }
+function closeChat() { document.getElementById('modal-chat').classList.remove('open'); ST.chatPO=null; }
 function renderChat() {
-  const p=findP(ST.chatCPO); if(!p) return;
+  const p=findP(ST.chatPO); if(!p) return;
   const msgs=parseNotes(p.Notes), legacy=(p.OmkonNotes?1:0)+(p.CPHNotes?1:0);
   const cnt=msgs.length||legacy;
-  document.getElementById('chat-modal-title').textContent='💬 '+p.Name+(p.PONumber?' · '+p.PONumber:'');
+  document.getElementById('chat-modal-title').textContent='💬 '+p.Name+' · PO '+p.PO;
   document.getElementById('chat-thread-modal').innerHTML=renderNotesBubbles(p);
   const t=document.getElementById('chat-thread-modal'); if(t) t.scrollTop=t.scrollHeight;
-  const btn=document.querySelector('.btn-chat[data-cpo="'+ST.chatCPO+'"]');
+  const btn=document.querySelector('.btn-chat[data-po="'+ST.chatPO+'"]');
   if(btn) btn.textContent='💬 '+(cnt?'Messages ('+cnt+')':'Start conversation');
 }
 function postNoteModal() {
-  const p=findP(ST.chatCPO); if(!p) return;
+  const p=findP(ST.chatPO); if(!p) return;
   const inp=document.getElementById('chat-modal-inp'); if(!inp) return;
   const txt=inp.value.trim(); if(!txt) return;
   let msgs=parseNotes(p.Notes);
@@ -1594,7 +1591,7 @@ function postNoteModal() {
   p.Updated=now(); p.UpdatedBy=author;
   const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   p.ChangeNote='Note from '+author+' · '+d+': '+txt.slice(0,50)+(txt.length>50?'…':'');
-  postFields(ST.chatCPO,['Notes','ChangeNote']); inp.value=''; renderChat();
+  postFields(ST.chatPO,['Notes','ChangeNote']); inp.value=''; renderChat();
 }
 
 const NOTE_SEP='^^^', NOTE_FLD='|||';
@@ -1630,7 +1627,7 @@ function renderNotesBubbles(p) {
 }
 function postNote(cpo) {
   const p=findP(cpo); if(!p) return;
-  const inp=document.querySelector('.chat-inp[data-cpo="'+cpo+'"]'); if(!inp) return;
+  const inp=document.querySelector('.chat-inp[data-po="'+cpo+'"]'); if(!inp) return;
   const txt=inp.value.trim(); if(!txt) return;
   const msgs=parseNotes(p.Notes);
   const author=ST.userName||(ST.role==='cphsteel'?'CPH Steel':'Omkon');
@@ -1641,7 +1638,7 @@ function postNote(cpo) {
   const d=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   p.ChangeNote='Note from '+who+' · '+d+': '+txt.slice(0,50)+(txt.length>50?'…':'');
   postFields(cpo,['Notes','ChangeNote']); inp.value=''; renderAll();
-  setTimeout(()=>{const t=document.querySelector('.chat-thread[data-cpo="'+cpo+'"]');if(t)t.scrollTop=t.scrollHeight;},60);
+  setTimeout(()=>{const t=document.querySelector('.chat-thread[data-po="'+cpo+'"]');if(t)t.scrollTop=t.scrollHeight;},60);
 }
 
 init();
