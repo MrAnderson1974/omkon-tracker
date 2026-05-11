@@ -27,7 +27,7 @@ function testAuth() {
 }
 
 function doGet() {
-  return ContentService.createTextContent('OMKON Apps Script v6 OK')
+  return ContentService.createTextOutput('OMKON Apps Script v6 OK')
     .setMimeType(ContentService.MimeType.TEXT);
 }
 
@@ -38,7 +38,7 @@ function doPost(e) {
     if (data.action === 'uploadDocs')  return handleUpload(data, 'docs');
     return handleWrite(data);
   } catch(err) {
-    return ContentService.createTextContent('error:' + err).setMimeType(ContentService.MimeType.TEXT);
+    return ContentService.createTextOutput('error:' + err).setMimeType(ContentService.MimeType.TEXT);
   }
 }
 
@@ -53,7 +53,7 @@ function handleWrite(data) {
 
   const poCol = hdrs.indexOf('PO');
   if (!data.PO || String(data.PO).trim() === '') {
-    return ContentService.createTextContent('error: PO is required').setMimeType(ContentService.MimeType.TEXT);
+    return ContentService.createTextOutput('error: PO is required').setMimeType(ContentService.MimeType.TEXT);
   }
 
   let rowIdx = -1;
@@ -83,7 +83,7 @@ function handleWrite(data) {
     writeLargeCols(sheet, rowIdx + 1, hdrs, data, existing);
   }
 
-  return ContentService.createTextContent('ok').setMimeType(ContentService.MimeType.TEXT);
+  return ContentService.createTextOutput('ok').setMimeType(ContentService.MimeType.TEXT);
 }
 
 function writeLargeCols(sheet, rowNum, hdrs, data, existing) {
@@ -152,7 +152,7 @@ function handleUpload(data, type) {
       break;
     }
   }
-  return ContentService.createTextContent('ok').setMimeType(ContentService.MimeType.TEXT);
+  return ContentService.createTextOutput('ok').setMimeType(ContentService.MimeType.TEXT);
 }
 
 function getFolder() {
