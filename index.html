@@ -1672,11 +1672,16 @@ function savePhotos() {
   const p=findP(ST.photoCPO); if(!p) return;
   const ts=now(); const by=ST.userName||ST.role;
   p.Photos=joinP(ST.pendingPhotos); p.Updated=ts; p.UpdatedBy=by;
-  // Send full project row — ensures a complete row lands in Sheet regardless
-  // of whether postRow (from submitCreate) has already landed. Eliminates race condition.
-  const payload={...p};
-  delete payload.Files;
-  fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(()=>{});
+  // If project was JUST created by this browser (< 30s ago), send full row to win the
+  // race against postRow. Otherwise send only Photos — avoids overwriting another user's
+  // fields with this browser's potentially incomplete view of the project.
+  const justCreated=_recentWrites[p.CPO]&&(Date.now()-_recentWrites[p.CPO])<30000;
+  if(justCreated){
+    const payload={...p}; delete payload.Files;
+    fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(()=>{});
+  } else {
+    postFields(p.CPO,['Photos']);
+  }
   closePhoto(); renderAll();
   toast(ST.pendingPhotos.length+' foto'+(ST.pendingPhotos.length!==1?'s':'')+' gemt','success');
 }
