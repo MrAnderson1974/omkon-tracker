@@ -1663,8 +1663,11 @@ function savePhotos() {
   const p=findP(ST.photoCPO); if(!p) return;
   const ts=now(); const by=ST.userName||ST.role;
   p.Photos=joinP(ST.pendingPhotos); p.Updated=ts; p.UpdatedBy=by;
-  // Send minimal payload — handleWrite preserves alle andre felter
-  fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({CPO:p.CPO,Photos:p.Photos,Updated:ts,UpdatedBy:by})}).catch(()=>{});
+  // Send full project row — ensures a complete row lands in Sheet regardless
+  // of whether postRow (from submitCreate) has already landed. Eliminates race condition.
+  const payload={...p};
+  delete payload.Files;
+  fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(()=>{});
   closePhoto(); renderAll();
   toast(ST.pendingPhotos.length+' foto'+(ST.pendingPhotos.length!==1?'s':'')+' gemt','success');
 }
