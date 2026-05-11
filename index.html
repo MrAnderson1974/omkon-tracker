@@ -1672,17 +1672,9 @@ function savePhotos() {
   const p=findP(ST.photoCPO); if(!p) return;
   const ts=now(); const by=ST.userName||ST.role;
   p.Photos=joinP(ST.pendingPhotos); p.Updated=ts; p.UpdatedBy=by;
-  // If project was JUST created by this browser (< 30s ago), send full row to win the
-  // race against postRow. Otherwise send only Photos — avoids overwriting another user's
-  // fields with this browser's potentially incomplete view of the project.
-  // justCreated: only true when submitCreate set the omkon_new_ key — not just any recent write
-  const justCreated=!!localStorage.getItem('omkon_new_'+p.CPO);
-  if(justCreated){
-    const payload={...p}; delete payload.Files;
-    fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(()=>{});
-  } else {
-    postFields(p.CPO,['Photos']);
-  }
+  // Always send only Photos — same rule as all other edits via postFields.
+  // postRow (submitCreate) owns the full row write. savePhotos never touches other fields.
+  postFields(p.CPO,['Photos']);
   closePhoto(); renderAll();
   toast(ST.pendingPhotos.length+' foto'+(ST.pendingPhotos.length!==1?'s':'')+' gemt','success');
 }
