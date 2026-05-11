@@ -156,6 +156,7 @@ GoodsReceived && DeliveryApproved && KS_DocReceived && KS_DocApproved && CBAM_Su
 
 | Dato | Commit | Beskrivelse |
 |------|--------|-------------|
+| 2026-05-11 | — | **🚀 Live i produktion.** Link delt med Omkon. Projektleder back-filler 2025 + 2026 projekter — trackeren bliver det officielle historiske register for stål-import. |
 | 2026-05-11 | `47a1f54` | **Fix: iOS Safari auto-zoom på input fokus.** Inputs med `font-size < 16px` får iOS til at zoome ind og forblive zoomet efter blur. Mobile media query tvinger nu alle `input/textarea/select` til 16px. Desktop-styling uændret. |
 | 2026-05-11 | `51aaa39` | **Feature: Mobile responsive layout (`max-width: 720px`).** Project card sections stacker vertikalt i stedet for 4 kolonner; kort-header reorganiseret med named grid areas (PO+status, navn, ansvarlig+tags, archive-knap); toolbar/stats kompakte; modaler fullscreen; year-tabs wrapper. Verificeret på iPhone-bredde. |
 | 2026-05-11 | `9195810` | **Fix: 3 issues fundet under live v6 end-to-end test.** (1) GAS_URL opdateret til nyt v6-deployment (ny URL efter "New deployment" i stedet for "New version"). (2) `Total` sendes nu som Number — string "5000.00" kolliderede med Sheets nummer-format-2-decimaler og blev "5000.00.00". (3) `fetchSheet` filter bruger nu PO-kolonne-index i stedet for kolonne A — v6 lader CPO-kolonnen (A) være tom, hvilket fik `r=>r[0]` til at ekskludere valide rækker og tvang frontend til at stole på stale `omkon_new_*` snapshots. End-to-end verificeret begge roller (CPH Steel + Omkon). |
