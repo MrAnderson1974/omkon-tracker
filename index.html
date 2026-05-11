@@ -802,13 +802,22 @@ function fetchSheet() {
         }
         return p;
       });
-      // Re-inject new projects created locally but not yet in CSV (Apps Script lag)
+      // Re-inject / patch new projects created locally but not yet fully in CSV
       Object.keys(localStorage).filter(k=>k.startsWith('omkon_new_')).forEach(k=>{
         const saved=JSON.parse(localStorage.getItem(k)||'null');
         if(!saved) return;
         if(Date.now()-saved.ts>120000){localStorage.removeItem(k);return;} // 2 min expiry
-        if(!projects.find(p=>p.CPO===saved.proj.CPO)) projects.unshift(saved.proj);
-        else localStorage.removeItem(k); // now in CSV — no longer needed
+        const csvIdx=projects.findIndex(p=>p.CPO===saved.proj.CPO);
+        if(csvIdx<0) {
+          projects.unshift(saved.proj); // not in CSV yet — inject fully
+        } else {
+          // CPO is in CSV but may be incomplete (race: savePhotos won the write race)
+          // Merge: localStorage fills in fields that are empty in CSV version
+          const csvProj=projects[csvIdx];
+          Object.keys(saved.proj).forEach(f=>{ if(!csvProj[f] && saved.proj[f] !== undefined) csvProj[f]=saved.proj[f]; });
+          // Only discard localStorage once key project data has landed in CSV
+          if(csvProj.Name) localStorage.removeItem(k);
+        }
       });
       ST.projects=projects; setLastSync(true);
       const extraActive=document.activeElement&&(document.activeElement.id||'').match(/^x[da]-/);
