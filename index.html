@@ -267,6 +267,8 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 }
 /* MOBILE */
 @media (max-width: 720px){
+  /* iOS Safari zooms when input font-size < 16px on focus — neutralize */
+  input,textarea,select,.edit-inp,.edit-ta,.rem-area,.chat-inp,.fg input,.fg select,.fg textarea{font-size:16px!important}
   .h-inner{padding:0 12px;height:auto;min-height:60px;gap:8px;flex-wrap:wrap}
   .h-logo img{max-height:36px;max-width:120px}
   .h-role-block{display:none}
