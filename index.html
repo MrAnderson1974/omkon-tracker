@@ -78,14 +78,6 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .proj-card{background:#fff;border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;border-left:5px solid var(--steel)}
 .proj-card.GREEN{border-left-color:var(--green)}.proj-card.YELLOW{border-left-color:#B8860B}.proj-card.RED{border-left-color:var(--red)}
 .pc-head{background:var(--coal);padding:12px 18px;display:grid;grid-template-columns:auto 1fr auto auto auto auto;align-items:center;gap:12px}
-.doc-chips{display:flex;flex-wrap:wrap;gap:6px;flex:1}
-.doc-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(186,162,144,.12);border:1px solid rgba(186,162,144,.25);border-radius:5px;padding:4px 10px;font-size:12px;font-family:var(--fb);color:var(--steel);text-decoration:none;transition:background .2s}
-.doc-chip:hover{background:rgba(186,162,144,.22);color:#fff}
-.doc-chip-icon{font-size:14px}
-.doc-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;font-size:13px}
-.doc-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.doc-item-del{background:transparent;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0 4px;line-height:1}
-.btn-doc{margin-left:auto}
 .btn-archive{background:transparent;border:1px solid rgba(186,162,144,.35);color:var(--tan);font-size:11px;font-family:var(--fh);padding:4px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;letter-spacing:.04em;transition:background .2s}
 .btn-archive:hover{background:rgba(186,162,144,.15)}
 .btn-unarchive{background:transparent;border:1px solid rgba(46,125,50,.35);color:var(--green);font-size:11px;font-family:var(--fh);padding:4px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;letter-spacing:.04em;transition:background .2s}
@@ -190,15 +182,8 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .chat-send{padding:8px 16px;background:var(--tan);color:#1a1a1a;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:.04em;flex-shrink:0}
 .chat-send:hover{opacity:.88}
 .chat-empty{font-size:11px;color:var(--steel);font-style:italic;padding:4px 0}
-/* PHOTOS / DOCS */
-.photo-strip{display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--g200);flex-wrap:wrap}
-.ps-lbl{font-family:var(--fh);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);white-space:nowrap}
-.ps-thumbs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
-.ps-thumb{width:48px;height:48px;object-fit:cover;border-radius:4px;cursor:pointer;border:2px solid var(--g200);transition:border-color .15s}
-.ps-thumb:hover{border-color:var(--tan)}
-.ps-more{font-size:11px;color:var(--steel);align-self:center}
-.btn-photo{background:rgba(186,162,144,.15);border:1px solid rgba(186,162,144,.3);color:var(--coal);padding:5px 12px;border-radius:var(--r);font-size:11px;font-weight:600;transition:background .2s;white-space:nowrap}
-.btn-photo:hover{background:rgba(186,162,144,.3)}
+.btn-chat{background:rgba(186,162,144,.15);border:1px solid rgba(186,162,144,.3);color:var(--coal);padding:5px 12px;border-radius:var(--r);font-size:11px;font-weight:600;transition:background .2s;white-space:nowrap}
+.btn-chat:hover{background:rgba(186,162,144,.3)}
 .upd-row{display:flex;gap:12px;padding:6px 16px;border-top:1px solid var(--g100);font-size:10px;color:var(--steel);font-style:italic}
 .change-note-strip{display:flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(186,162,144,.13);border-top:1px solid rgba(186,162,144,.25);font-size:11px;color:var(--tan);font-style:italic}
 /* OVERLAYS / MODALS */
@@ -224,11 +209,6 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .fg input,.fg select,.fg textarea{padding:8px 10px;border-radius:var(--r);border:1px solid var(--g200);font-size:13px;color:var(--coal);background:#fff;outline:none}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--tan)}
 .fg textarea{min-height:70px;resize:vertical}
-/* PHOTO GRID */
-.photo-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.ph-item{position:relative;display:inline-block}
-.ph-item img{width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid var(--g200);display:block}
-.ph-del{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
 .drop-zone{border:2px dashed var(--g200);border-radius:var(--rl);padding:24px;text-align:center;cursor:pointer;color:var(--steel);font-size:13px;transition:border-color .2s}
 .drop-zone:hover,.drop-zone.over{border-color:var(--tan);background:rgba(186,162,144,.05)}
 /* CASH FLOW MODAL */
@@ -249,14 +229,6 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
 .cf-tot-val{font-size:18px;font-weight:700;font-family:var(--fh)}
 .cf-btn-export{background:var(--green);color:#fff;padding:7px 16px;border-radius:var(--r);font-size:11px;font-weight:700;font-family:var(--fh);letter-spacing:.05em;text-transform:uppercase}
 .cf-btn-export:hover{filter:brightness(.9)}
-/* LIGHTBOX */
-.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:2000;display:none;align-items:center;justify-content:center}
-.lightbox.open{display:flex}
-.lb-img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:4px}
-.lb-close{position:absolute;top:20px;right:24px;font-size:28px;color:#fff;cursor:pointer;z-index:10;opacity:.7}
-.lb-close:hover{opacity:1}
-.lb-nav{position:absolute;top:50%;transform:translateY(-50%);font-size:48px;color:#fff;cursor:pointer;padding:0 20px;opacity:.5;user-select:none}
-.lb-nav:hover{opacity:1}
 #lb-prev{left:0}#lb-next{right:0}
 .lb-cnt{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:12px;font-family:var(--fb)}
 /* LOGIN */
@@ -423,15 +395,6 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
   </div>
 </div>
 
-<!-- LIGHTBOX -->
-<div id="lightbox" class="lightbox" onclick="lbBg(event)">
-  <span class="lb-close" onclick="closeLB()">✕</span>
-  <span class="lb-nav" id="lb-prev" onclick="lbNav(-1);event.stopPropagation()">‹</span>
-  <img class="lb-img" id="lb-img" src="" alt="" />
-  <span class="lb-nav" id="lb-next" onclick="lbNav(1);event.stopPropagation()">›</span>
-  <div class="lb-cnt" id="lb-cnt"></div>
-</div>
-
 <!-- CREATE MODAL -->
 <div class="overlay" id="modal-create">
   <div class="modal">
@@ -478,42 +441,6 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
     <div class="modal-ft">
       <button class="btn-cancel" onclick="closeCreate()">Cancel</button>
       <button class="btn-submit" onclick="document.getElementById('form-create').requestSubmit()">Create Project</button>
-    </div>
-  </div>
-</div>
-
-<!-- PHOTO MODAL -->
-<div class="overlay" id="modal-photo">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-hd"><h2 id="photo-title">Photos</h2><button class="btn-x" onclick="closePhoto()">✕</button></div>
-    <div class="modal-bd">
-      <div class="photo-grid" id="photo-grid"></div>
-      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-inp').click()">
-        📷 Click or drag photos here<br><span style="font-size:11px;opacity:.6">Max 2 MB — auto-compressed to 800px</span>
-      </div>
-      <input type="file" id="file-inp" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)"/>
-    </div>
-    <div class="modal-ft">
-      <button class="btn-cancel" onclick="closePhoto()">Annuller</button>
-      <button class="btn-submit" onclick="savePhotos()">Gem fotos</button>
-    </div>
-  </div>
-</div>
-
-<!-- DOCS MODAL -->
-<div class="overlay" id="modal-docs">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-hd"><h2 id="docs-title">Documents</h2><button class="btn-x" onclick="closeDocs()">✕</button></div>
-    <div class="modal-bd">
-      <div id="doc-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
-      <div class="drop-zone" id="doc-drop-zone" onclick="document.getElementById('doc-inp').click()">
-        📎 Click or drag files here<br><span style="font-size:11px;opacity:.6">PDF, Word, Excel — max 10 MB per file</span>
-      </div>
-      <input type="file" id="doc-inp" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg" multiple style="display:none" onchange="handleDocFiles(this.files)"/>
-    </div>
-    <div class="modal-ft">
-      <button class="btn-cancel" onclick="closeDocs()">Annuller</button>
-      <button class="btn-submit" onclick="saveDocs()">Gem</button>
     </div>
   </div>
 </div>
@@ -647,7 +574,6 @@ const DEMO = [
 ];
 DEMO.forEach(p=>{
   if(p.Archived===undefined) p.Archived=false;
-  if(p.Files===undefined) p.Files='';
   if(p.Pay1Date===undefined) p.Pay1Date='';
   if(p.Pay2Date===undefined) p.Pay2Date='';
   if(p.Pay3Date===undefined) p.Pay3Date='';
@@ -667,9 +593,6 @@ const ST = {
   sortCol:'deadline', sortDir:'asc',
   filterHealth:'all', filterPerson:'all', searchQ:'',
   filterYear: localStorage.getItem('omkon_year')||'all',
-  photoCPO:null, pendingPhotos:[],
-  docCPO:null, pendingDocs:[],
-  lbPhotos:[], lbIdx:0,
   archiveOpen:false,
   cbamOpen: new Set(),
   chatCPO: null,
@@ -752,7 +675,7 @@ function fetchSheet() {
       const rows=parseCSV(csv); if(rows.length<2)return;
       const hdrs=rows[0];
       const projects=rows.slice(1).filter(r=>r[0]).map(row=>{
-        const p={Photos:''};
+        const p={};
         hdrs.forEach((h,i)=>p[h]=row[i]??'');
         ['Qty','Price','Total','Pct','ExtraAmount'].forEach(f=>{if(p[f]) p[f]=normalizeDaNum(p[f]);});
         BOOL_FIELDS.forEach(f=>{p[f]=p[f]==='TRUE'||p[f]==='true'||p[f]===true;});
@@ -760,7 +683,6 @@ function fetchSheet() {
         // If written within last 30s, keep local version — Apps Script may not have processed yet
         if(ex && _recentWrites[p.CPO] && (Date.now()-_recentWrites[p.CPO])<30000) return ex;
         if(ex) {
-          if(!p.Photos) p.Photos=ex.Photos; // keep local base64 until Drive URLs land in CSV
           if(ex.Notes && !p.Notes) p.Notes=ex.Notes;
           if(ex.ExtraDesc  && !p.ExtraDesc)  p.ExtraDesc=ex.ExtraDesc;
           if(ex.ExtraAmount && !p.ExtraAmount) p.ExtraAmount=ex.ExtraAmount;
@@ -811,8 +733,7 @@ function fetchSheet() {
         if(csvIdx<0) {
           projects.unshift(saved.proj); // not in CSV yet — inject fully
         } else {
-          // CPO is in CSV but may be incomplete (race: savePhotos won the write race)
-          // Merge: localStorage fills in fields that are empty in CSV version
+          // CPO is in CSV but may be incomplete — merge localStorage fields that are empty
           const csvProj=projects[csvIdx];
           Object.keys(saved.proj).forEach(f=>{ if(!csvProj[f] && saved.proj[f] !== undefined) csvProj[f]=saved.proj[f]; });
           // Only discard localStorage once key project data has landed in CSV
@@ -842,8 +763,8 @@ function postRow(proj) {
   if(!CONFIGURED)return;
   _recentWrites[proj.CPO]=Date.now();
   const payload={...proj};
-  delete payload.Photos; // written separately via savePhotos — never in regular row write
-  delete payload.Files;  // handled by uploadDocs action — never in row write
+  delete payload.Photos;
+  delete payload.Files;
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
 }
 // Send only specific fields — Apps Script merge keeps all other Sheet values intact.
@@ -854,10 +775,6 @@ function postFields(cpo, fields) {
   _recentWrites[cpo]=Date.now();
   const payload={CPO:cpo, Updated:p.Updated, UpdatedBy:p.UpdatedBy};
   fields.forEach(f=>{ if(p[f]!==undefined) payload[f]=p[f]; });
-  fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
-}
-function postGAS(payload) {
-  if(!CONFIGURED)return;
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
 }
 function setLastSync(ok) {
@@ -980,12 +897,9 @@ function cardHTML(p, isArchived=false) {
   const h=health(p.Pct,p.Deadline);
   const pct=Math.min(100,Math.max(0,parseFloat(p.Pct)||0));
   const pc=pct>=70?'hi':pct>=40?'md':'lo';
-  const photos=splitP(p.Photos);
   const total=parseFloat(p.Total)||0;
   const tags=p.KS_Tags?p.KS_Tags.split(',').map(t=>`<span class="tag">${esc(t.trim())}</span>`).join(''):'';
   const dc=dlCls(p.Deadline);
-  const thumbs=photos.slice(0,5).map((u,i)=>`<img class="ps-thumb" src="${esc(u)}" data-cpo="${esc(p.CPO)}" data-idx="${i}" alt="" />`).join('');
-  const more=photos.length>5?`<span class="ps-more">+${photos.length-5} more</span>`:'';
 
   // Final payment conditional logic
   const finalUnlocked = p.GoodsReceived && p.DeliveryApproved && p.KS_DocReceived && p.KS_DocApproved && p.CBAM_Submitted && p.CBAM_Registered;
@@ -1139,9 +1053,8 @@ function cardHTML(p, isArchived=false) {
   </div><!-- /pc-body -->
 
   <!-- MESSAGES BUTTON -->
-  <div class="photo-strip" style="align-items:center" data-tip="Open shared message thread — visible to both CPH Steel and Omkon">
-    <span class="ps-lbl">Messages</span>
-    <button class="btn-photo btn-chat" data-cpo="${esc(p.CPO)}" onclick="openChat('${esc(p.CPO)}')">${(()=>{const bad=['false','true'];const vl=s=>s&&!bad.includes(s.trim().toLowerCase());const n=parseNotes(p.Notes).filter(m=>m.t&&m.t.trim()&&!bad.includes(m.t.trim().toLowerCase())).length||(vl(p.OmkonNotes)?1:0)+(vl(p.CPHNotes)?1:0);return '💬 '+(n?'Messages ('+n+')':'Start conversation');})()}</button>
+  <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--g200)" data-tip="Open shared message thread — visible to both CPH Steel and Omkon">
+    <button class="btn-chat" data-cpo="${esc(p.CPO)}" onclick="openChat('${esc(p.CPO)}')">${(()=>{const bad=['false','true'];const vl=s=>s&&!bad.includes(s.trim().toLowerCase());const n=parseNotes(p.Notes).filter(m=>m.t&&m.t.trim()&&!bad.includes(m.t.trim().toLowerCase())).length||(vl(p.OmkonNotes)?1:0)+(vl(p.CPHNotes)?1:0);return '💬 '+(n?'Messages ('+n+')':'Start conversation');})()}</button>
   </div>
 
   <!-- CBAM -->
@@ -1155,21 +1068,6 @@ function cardHTML(p, isArchived=false) {
       <span class="pfl">Verified by CPH Steel</span>
       ${isCPH ? tog(p.CBAM_Registered, p.CPO, 'CBAM_Registered') : togRO(p.CBAM_Registered)}
     </div>
-  </div>
-
-  <!-- PHOTOS -->
-  <div class="photo-strip">
-    <span class="ps-lbl">Photos</span>
-    <div class="ps-thumbs">${thumbs}${more}</div>
-    <button class="btn-photo" data-cpo="${esc(p.CPO)}">📷 ${photos.length?'Manage ('+photos.length+')':'Add photos'}</button>
-  </div>
-
-  <!-- DOCUMENTS -->
-  <div class="photo-strip" style="flex-wrap:wrap;gap:8px">
-    <span class="ps-lbl">Documents</span>
-    <div class="doc-chips">${renderDocChips(p)}</div>
-    <button class="btn-photo btn-doc" data-cpo="${esc(p.CPO)}" data-tip="Attach PDF, Word or Excel">📎 ${splitFiles(p.Files).length?'Manage ('+splitFiles(p.Files).length+')':'Add files'}</button>
-    ${p.FilesBy?`<div style="width:100%;font-size:10px;color:var(--steel);font-style:italic;padding-top:2px">Files updated by: ${esc(p.FilesBy)}</div>`:''}
   </div>
 
   ${(()=>{
@@ -1410,11 +1308,6 @@ let activeEl=null;
 function bindEvents() {
   const area=document.getElementById('main-area');
   area.addEventListener('click', e => {
-    if(e.target.classList.contains('ps-thumb')) { openLB(e.target.dataset.cpo, parseInt(e.target.dataset.idx)); return; }
-    const docb=e.target.closest('.btn-doc[data-cpo]');
-    if(docb) { openDocs(docb.dataset.cpo); return; }
-    const phb=e.target.closest('.btn-photo[data-cpo]');
-    if(phb && !phb.classList.contains('btn-doc')) { openPhoto(phb.dataset.cpo); return; }
     const tog=e.target.closest('.tog[data-field]');
     if(tog) { doToggle(tog.dataset.cpo, tog.dataset.field); return; }
     const pay=e.target.closest('.pay-pill[data-pay]');
@@ -1445,25 +1338,13 @@ function bindEvents() {
   document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
     if(e.target!==o) return;
     o.classList.remove('open');
-    if(o.id==='modal-photo') closePhoto();
-    if(o.id==='modal-docs') closeDocs();
     if(o.id==='modal-create') closeCreate();
     if(o.id==='modal-cashflow') closeCashFlow();
     if(o.id==='modal-chat') closeChat();
   }));
   document.addEventListener('keydown', e=>{
-    if(e.key==='Escape') { closeLBDirect(); document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open')); cancelEdit(); }
-    const lb=document.getElementById('lightbox');
-    if(lb.classList.contains('open')) { if(e.key==='ArrowLeft') lbNav(-1); if(e.key==='ArrowRight') lbNav(1); }
+    if(e.key==='Escape') { document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open')); cancelEdit(); }
   });
-  const dz=document.getElementById('drop-zone');
-  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
-  dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
-  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');handleFiles(e.dataTransfer.files);});
-  const ddz=document.getElementById('doc-drop-zone');
-  ddz.addEventListener('dragover',e=>{e.preventDefault();ddz.classList.add('over');});
-  ddz.addEventListener('dragleave',()=>ddz.classList.remove('over'));
-  ddz.addEventListener('drop',e=>{e.preventDefault();ddz.classList.remove('over');handleDocFiles(e.dataTransfer.files);});
 }
 
 // ARCHIVE
@@ -1597,140 +1478,12 @@ function submitCreate(e) {
     Pct:g('pct')||'0',
     Notes: g('initial_note') ? JSON.stringify([{r:ST.role,a:ST.userName||ST.role,t:g('initial_note'),ts:new Date().toISOString()}]) : '',
     OmkonNotes:'', OmkonNotesBy:'', CPHNotes:'', CPHNotesBy:'',
-    Photos:'', Files:'', Updated:now(), UpdatedBy:ST.userName||ST.role, Archived:false,
+    Updated:now(), UpdatedBy:ST.userName||ST.role, Archived:false,
   };
   // Persist new project in localStorage for 2 min — survives page reload before Apps Script lands
   localStorage.setItem('omkon_new_'+cpo, JSON.stringify({proj, ts:Date.now()}));
   ST.projects.unshift(proj); postRow(proj); closeCreate(); renderYearTabs(); renderAll(); rebuildPersonFilter();
   toast('Project '+cpo+' created','success');
-}
-
-// LIGHTBOX
-function openLB(cpo, idx) {
-  const p=findP(cpo); if(!p) return;
-  ST.lbPhotos=splitP(p.Photos); if(!ST.lbPhotos.length) return;
-  ST.lbIdx=Math.min(idx,ST.lbPhotos.length-1); updateLB();
-  document.getElementById('lightbox').classList.add('open');
-}
-function updateLB() { document.getElementById('lb-img').src=ST.lbPhotos[ST.lbIdx]; document.getElementById('lb-cnt').textContent=(ST.lbIdx+1)+' / '+ST.lbPhotos.length; }
-function lbNav(d) { ST.lbIdx=(ST.lbIdx+d+ST.lbPhotos.length)%ST.lbPhotos.length; updateLB(); }
-function lbBg(e) { if(e.target===document.getElementById('lightbox')) closeLBDirect(); }
-function closeLBDirect() { document.getElementById('lightbox').classList.remove('open'); }
-function closeLB() { closeLBDirect(); }
-
-// PHOTOS
-function splitP(s) { return s?s.split(SEP).filter(Boolean):[]; }
-function joinP(arr) { return arr.join(SEP); }
-function openPhoto(cpo) {
-  ST.photoCPO=cpo;
-  const p=findP(cpo); ST.pendingPhotos=p?splitP(p.Photos):[];
-  document.getElementById('photo-title').textContent='Photos — '+cpo;
-  renderPhotoGrid(); document.getElementById('modal-photo').classList.add('open');
-}
-function closePhoto() { document.getElementById('modal-photo').classList.remove('open'); ST.photoCPO=null; ST.pendingPhotos=[]; }
-function renderPhotoGrid() {
-  const g=document.getElementById('photo-grid');
-  if(!ST.pendingPhotos.length) { g.innerHTML='<p style="color:var(--steel);font-size:12px;margin-bottom:12px">Ingen fotos endnu</p>'; return; }
-  g.innerHTML=ST.pendingPhotos.map((u,i)=>`<div class="ph-item"><img src="${esc(u)}" data-idx="${i}" /><button class="ph-del" onclick="delPhoto(${i})">✕</button></div>`).join('');
-  g.querySelectorAll('img').forEach(img=>img.addEventListener('click',()=>{
-    ST.lbPhotos=[...ST.pendingPhotos]; ST.lbIdx=parseInt(img.dataset.idx); updateLB();
-    document.getElementById('lightbox').classList.add('open');
-  }));
-}
-function delPhoto(i) { ST.pendingPhotos.splice(i,1); renderPhotoGrid(); }
-function handleFiles(files) {
-  Array.from(files).forEach(file=>{
-    if(file.size>2*1024*1024){toast(file.name+': max 2 MB','error');return;}
-    compress(file).then(b64=>{ST.pendingPhotos.push(b64);renderPhotoGrid();toast('Photo added ('+ST.pendingPhotos.length+' total)','info');});
-  });
-  document.getElementById('file-inp').value='';
-}
-// Google Sheets cell limit: 50,000 chars. With multiple photos joined, keep each well under.
-// Target: < 20,000 chars per photo. Loop reduces quality until guaranteed safe.
-const PHOTO_CHAR_LIMIT = 20000;
-function compress(file) {
-  return new Promise(res=>{
-    const r=new FileReader();
-    r.onload=ev=>{
-      const img=new Image(); img.onload=()=>{
-        function tryCompress(maxPx, quality) {
-          const ratio=Math.min(maxPx/img.width,maxPx/img.height,1);
-          const c=document.createElement('canvas');
-          c.width=Math.round(img.width*ratio); c.height=Math.round(img.height*ratio);
-          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-          const out=c.toDataURL('image/jpeg',quality);
-          if(out.length<=PHOTO_CHAR_LIMIT || quality<=0.15) return out;
-          if(quality>0.2) return tryCompress(maxPx, Math.round((quality-0.1)*10)/10);
-          return tryCompress(Math.round(maxPx*0.7), 0.2); // shrink dimensions too
-        }
-        res(tryCompress(200, 0.5));
-      }; img.src=ev.target.result;
-    }; r.readAsDataURL(file);
-  });
-}
-function savePhotos() {
-  const p=findP(ST.photoCPO); if(!p) return;
-  const ts=now(); const by=ST.userName||ST.role;
-  // Upload to Drive — Apps Script converts base64 → tiny Drive URLs stored in Sheet
-  // Same pattern as saveDocs. Avoids storing large base64 strings in Sheet cells.
-  postGAS({action:'uploadFiles', cpo:p.CPO, photos:ST.pendingPhotos, updated:ts, updatedBy:by});
-  // Optimistic local update: show photos immediately while Drive upload completes (~5-10s)
-  p.Photos=joinP(ST.pendingPhotos); p.Updated=ts; p.UpdatedBy=by;
-  _recentWrites[p.CPO]=Date.now(); // protect local base64 state during upload window
-  closePhoto(); renderAll();
-  toast(ST.pendingPhotos.length+' foto'+(ST.pendingPhotos.length!==1?'s':'')+' uploades til Drive — vises om få sekunder','info');
-  setTimeout(fetchSheet, 10000);
-}
-
-// DOCUMENTS
-const FSEP = '^^^';
-function splitFiles(s) {
-  if(!s) return [];
-  return s.split(SEP).filter(Boolean).map(e=>{const idx=e.indexOf(FSEP);if(idx===-1)return null;return {name:e.slice(0,idx),url:e.slice(idx+FSEP.length)};}).filter(Boolean);
-}
-function joinFiles(arr) { return arr.map(f=>f.name+FSEP+f.url).join(SEP); }
-function fileIcon(name) {
-  const ext=(name.split('.').pop()||'').toLowerCase();
-  if(ext==='pdf') return '📄'; if(['doc','docx'].includes(ext)) return '📝';
-  if(['xls','xlsx'].includes(ext)) return '📊'; if(['png','jpg','jpeg'].includes(ext)) return '🖼️';
-  return '📎';
-}
-function renderDocChips(p) {
-  const files=splitFiles(p.Files);
-  if(!files.length) return '<span style="color:var(--steel);font-size:12px">No files</span>';
-  return files.map(f=>`<a class="doc-chip" href="${f.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" data-tip="Download ${esc(f.name)}"><span class="doc-chip-icon">${fileIcon(f.name)}</span>${esc(f.name)}</a>`).join('');
-}
-function openDocs(cpo) {
-  ST.docCPO=cpo; ST.pendingDocs=splitFiles(findP(cpo)?.Files||'');
-  document.getElementById('docs-title').textContent='Documents — '+cpo;
-  renderDocList(); document.getElementById('modal-docs').classList.add('open');
-}
-function closeDocs() { document.getElementById('modal-docs').classList.remove('open'); ST.docCPO=null; ST.pendingDocs=[]; }
-function renderDocList() {
-  const el=document.getElementById('doc-list');
-  el.innerHTML=ST.pendingDocs.length
-    ? ST.pendingDocs.map((f,i)=>`<div class="doc-item"><span class="doc-chip-icon">${fileIcon(f.name)}</span><span class="doc-item-name">${esc(f.name)}</span>${f.url.startsWith('http')?`<a href="${f.url}" target="_blank" rel="noopener" style="font-size:11px;color:var(--steel);margin-right:6px">⬇ Download</a>`:'<span style="font-size:11px;color:var(--steel);margin-right:6px">Pending upload</span>'}<button class="doc-item-del" onclick="removeDoc(${i})">✕</button></div>`).join('')
-    : '<div style="color:var(--steel);font-size:12px;padding:4px 0">No files added yet</div>';
-}
-function removeDoc(idx) { ST.pendingDocs.splice(idx,1); renderDocList(); }
-function handleDocFiles(files) {
-  [...files].forEach(file=>{
-    if(file.size>10*1024*1024){toast(file.name+': max 10 MB','error');return;}
-    const r=new FileReader();
-    r.onload=ev=>{ ST.pendingDocs.push({name:file.name, url:ev.target.result}); renderDocList(); };
-    r.readAsDataURL(file);
-  });
-}
-function saveDocs() {
-  const p=findP(ST.docCPO); if(!p) return;
-  const ts=now(); const by=ST.userName||ST.role;
-  postGAS({action:'uploadDocs', cpo:p.CPO, files:ST.pendingDocs, updated:ts, updatedBy:by});
-  // Optimistic local update — Drive URLs will replace base64 after next CSV poll
-  p.Files=joinFiles(ST.pendingDocs); p.Updated=ts; p.UpdatedBy=by;
-  p.FilesBy=by+' · '+fmtShort();
-  closeDocs(); renderAll();
-  toast('Filer uploades til Drive — vises om få sekunder','info');
-  setTimeout(fetchSheet, 8000);
 }
 
 // ROLE
@@ -1807,7 +1560,6 @@ function now() { return new Date().toISOString(); }
 function fmtShort() { return new Date().toLocaleDateString('da-DK',{day:'2-digit',month:'short',year:'2-digit'}); }
 
 function openChat(cpo) {
-  closePhoto(); closeDocs();
   ST.chatCPO=cpo; renderChat();
   document.getElementById('modal-chat').classList.add('open');
   setTimeout(()=>{
@@ -1815,7 +1567,7 @@ function openChat(cpo) {
     document.getElementById('chat-modal-inp')?.focus();
   },60);
 }
-function closeChat() { document.getElementById('modal-chat').classList.remove('open'); ST.chatCPO=null; closePhoto(); closeDocs(); }
+function closeChat() { document.getElementById('modal-chat').classList.remove('open'); ST.chatCPO=null; }
 function renderChat() {
   const p=findP(ST.chatCPO); if(!p) return;
   const msgs=parseNotes(p.Notes), legacy=(p.OmkonNotes?1:0)+(p.CPHNotes?1:0);
