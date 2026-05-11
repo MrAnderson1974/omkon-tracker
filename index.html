@@ -760,7 +760,7 @@ function fetchSheet() {
         // If written within last 30s, keep local version — Apps Script may not have processed yet
         if(ex && _recentWrites[p.CPO] && (Date.now()-_recentWrites[p.CPO])<30000) return ex;
         if(ex) {
-          p.Photos=ex.Photos;
+          if(!p.Photos) p.Photos=ex.Photos; // keep local base64 until Drive URLs land in CSV
           if(ex.Notes && !p.Notes) p.Notes=ex.Notes;
           if(ex.ExtraDesc  && !p.ExtraDesc)  p.ExtraDesc=ex.ExtraDesc;
           if(ex.ExtraAmount && !p.ExtraAmount) p.ExtraAmount=ex.ExtraAmount;
@@ -1671,12 +1671,15 @@ function compress(file) {
 function savePhotos() {
   const p=findP(ST.photoCPO); if(!p) return;
   const ts=now(); const by=ST.userName||ST.role;
+  // Upload to Drive — Apps Script converts base64 → tiny Drive URLs stored in Sheet
+  // Same pattern as saveDocs. Avoids storing large base64 strings in Sheet cells.
+  postGAS({action:'uploadFiles', cpo:p.CPO, photos:ST.pendingPhotos, updated:ts, updatedBy:by});
+  // Optimistic local update: show photos immediately while Drive upload completes (~5-10s)
   p.Photos=joinP(ST.pendingPhotos); p.Updated=ts; p.UpdatedBy=by;
-  // Always send only Photos — same rule as all other edits via postFields.
-  // postRow (submitCreate) owns the full row write. savePhotos never touches other fields.
-  postFields(p.CPO,['Photos']);
+  _recentWrites[p.CPO]=Date.now(); // protect local base64 state during upload window
   closePhoto(); renderAll();
-  toast(ST.pendingPhotos.length+' foto'+(ST.pendingPhotos.length!==1?'s':'')+' gemt','success');
+  toast(ST.pendingPhotos.length+' foto'+(ST.pendingPhotos.length!==1?'s':'')+' uploades til Drive — vises om få sekunder','info');
+  setTimeout(fetchSheet, 10000);
 }
 
 // DOCUMENTS
