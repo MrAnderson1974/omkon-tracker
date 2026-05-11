@@ -403,7 +403,7 @@ header{background:var(--role-bg);border-bottom:3px solid var(--role-accent);posi
       <form id="form-create" onsubmit="submitCreate(event)">
         <div class="fgrid">
           <div class="fsec">Project Info</div>
-          <div class="fg s2"><label>Sags nr. *</label><input name="po_number" required placeholder="e.g. 25115-6"/></div>
+          <div class="fg s2"><label>PO nr. *</label><input name="po_number" required placeholder="e.g. 25115-6"/></div>
           <div class="fg"><label>Project Name *</label><input name="name" required placeholder="e.g. Facade Phase 2"/></div>
           <div class="fg"><label>Responsible *</label><input name="responsible" required placeholder="Full name"/></div>
           <div class="fg"><label>Email</label><input type="email" name="email" placeholder="name@company.com"/></div>
@@ -676,7 +676,7 @@ function fetchSheet() {
       const hdrs=rows[0];
       const projects=rows.slice(1).filter(r=>r[0]).map(row=>{
         const p={};
-        hdrs.forEach((h,i)=>p[h]=row[i]??'');
+        hdrs.forEach((h,i)=>{const v=(row[i]??'').trim();p[h]=(v==='#ERROR!'||v==='#NAME?'||v==='#VALUE!')?'':v.replace(/^ /,'');});
         ['Qty','Price','Total','Pct','ExtraAmount'].forEach(f=>{if(p[f]) p[f]=normalizeDaNum(p[f]);});
         BOOL_FIELDS.forEach(f=>{p[f]=p[f]==='TRUE'||p[f]==='true'||p[f]===true;});
         const ex=findP(p.CPO);
@@ -934,7 +934,7 @@ function cardHTML(p, isArchived=false) {
       <div class="pcs-title">Timeline &amp; Contract</div>
       <div class="pf"><span class="pfl">Project start</span>
         <span class="pfv ${p.Pay1Date?'conf':'muted'} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Pay1Date" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Sets down payment due date':'Project start = down payment due date'}">${fmtD(p.Pay1Date)||'—'}</span></div>
-      <div class="pf"><span class="pfl">Sags nr.</span>
+      <div class="pf"><span class="pfl">PO nr.</span>
         <span class="pfv mono ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="PONumber" data-t="text"`:''} data-tip="${isCPH?'Click to edit · Customer purchase order reference':'Customer purchase order reference'}">${esc(p.PONumber)||'—'}</span></div>
       <div class="pf"><span class="pfl">Shipping / deadline</span>
         <span class="pfv ${dc} ${isCPH?'ed':''}" ${isCPH?`data-cpo="${esc(p.CPO)}" data-f="Deadline" data-t="date"`:''} data-tip="${isCPH?'Click to edit · Drives year grouping and health status':'Delivery deadline'}">${fmtD(p.Deadline)||'—'}</span></div>
@@ -1270,7 +1270,7 @@ function exportExcel() {
   }
 
   // Sheet 2: Projects overview
-  const prHeaders = ['CPO','Sags nr.','Project','Responsible','Deadline','Pickup','Total (EUR)','Qty (kg)','Progress %','Pay 1','Pay 2','Pay 3','Goods rcv.','Delivery appr.','KS doc rcv.','KS doc appr.','CBAM submitted','CBAM verified'];
+  const prHeaders = ['CPO','PO nr.','Project','Responsible','Deadline','Pickup','Total (EUR)','Qty (kg)','Progress %','Pay 1','Pay 2','Pay 3','Goods rcv.','Delivery appr.','KS doc rcv.','KS doc appr.','CBAM submitted','CBAM verified'];
   const prRows = [prHeaders];
   open.forEach(p=>{
     prRows.push([
