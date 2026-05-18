@@ -10,11 +10,11 @@
 
 ---
 
-## Live konfiguration (linje 563–568 i index.html)
+## Live konfiguration
 
 ```javascript
 const SHEET_ID = '1ZwrdoIvV63lwGNqo-JiObDU1WnbMAlkPNh-HCmXwrdc';
-const GAS_URL  = 'https://script.google.com/macros/s/AKfycbyVxID4TA4t5muFeeHxPx0MO_gxai3hUFaLosIw20Va3h27KmJ375GJcrBRZ2GfMtuP/exec';
+const GAS_URL  = 'https://script.google.com/macros/s/AKfycbygaNJ8ZuuN3VkKB4T-VxFbtF1IQfOHIreizBK4VoqZPOkbC-4DtXegZyCBcD90Jtkw/exec';
 ```
 
 - **Google Sheet URL:** https://docs.google.com/spreadsheets/d/1ZwrdoIvV63lwGNqo-JiObDU1WnbMAlkPNh-HCmXwrdc/edit
@@ -156,6 +156,8 @@ GoodsReceived && DeliveryApproved && KS_DocReceived && KS_DocApproved && CBAM_Su
 
 | Dato | Commit | Beskrivelse |
 |------|--------|-------------|
+| 2026-05-18 | — | **Fix: Tal skrives som tekst i sheet + forkert Total efter localStorage-restore.** 4 root causes: (1) `p.Total` i localStorage-restore (linje 750) blev sat som da-DK streng `"22.125,00"` — `parseFloat` læste kun `22.125` i stedet for `22125`. Fix: `+(qty*price).toFixed(2)` (JS number). (2) Edit-input viste engelsk format `"2.95"` i stedet for dansk `"2,95"` — brugeren så period-decimal og rettede forkert. Fix: `n.toLocaleString('da-DK')` i `startEdit`. (3) Normaliserede tal blev sendt som string `"3.35"` til GAS → `setValue("3.35")` gemmer som tekst, ikke tal → sheet viser `3.35` uden dansk formatering. Fix: `parseFloat(v)` i `commitEdit` før lagring. (4) `submitCreate` gemte `Qty`/`Price` som rå form-strenge. Fix: bruger nu de allerede `parseFloat`'ede variabler `q`/`pr`. |
+| 2026-05-18 | `a828ca9` | **Fix: Prisfelt ruller tilbage til gammel værdi.** To root causes: (1) GAS `handleWrite` skrev hele rækken ved `postFields`-calls — concurrent write fra anden bruger læste gammel pris fra sheet og overskrev. Fix: ny `_partial`-gren i GAS der bruger per-celle `setValue()` i stedet for `setValues([hel række])`. Frontend sender `_partial:true` flag i `postFields`. (2) `fetchSheet` localStorage-restore smed Price-edit væk når *andre* felter på samme række fik `Updated`-timestamp til at ændre sig — blev fejlagtigt tolket som konflikt. Fix: `prevUpdated`-check fjernet; localStorage ryddes kun når sheet allerede viser den gemte værdi. Ny GAS deployment URL. |
 | 2026-05-11 | — | **🚀 Live i produktion.** Link delt med Omkon. Projektleder back-filler 2025 + 2026 projekter — trackeren bliver det officielle historiske register for stål-import. |
 | 2026-05-11 | `47a1f54` | **Fix: iOS Safari auto-zoom på input fokus.** Inputs med `font-size < 16px` får iOS til at zoome ind og forblive zoomet efter blur. Mobile media query tvinger nu alle `input/textarea/select` til 16px. Desktop-styling uændret. |
 | 2026-05-11 | `51aaa39` | **Feature: Mobile responsive layout (`max-width: 720px`).** Project card sections stacker vertikalt i stedet for 4 kolonner; kort-header reorganiseret med named grid areas (PO+status, navn, ansvarlig+tags, archive-knap); toolbar/stats kompakte; modaler fullscreen; year-tabs wrapper. Verificeret på iPhone-bredde. |
@@ -198,5 +200,6 @@ GoodsReceived && DeliveryApproved && KS_DocReceived && KS_DocApproved && CBAM_Su
 ## Kendte begrænsninger
 
 - Fotos/filer synkroniseres ikke på tværs af enheder (Base64 i localStorage)
+- Apps Script `postFields`-writes er per-celle (v6 patch) — `postRow` (opret) skriver stadig hele rækken
 - Apps Script write er fire-and-forget (no-cors) — ingen fejlbekræftelse
 - Sheet CSV-opdatering er 10 sekunders polling — ikke realtime

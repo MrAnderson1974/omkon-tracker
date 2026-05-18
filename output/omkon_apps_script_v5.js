@@ -58,9 +58,11 @@ function handleWrite(data) {
 
   if (rowIdx < 0) {
     // Ny række: skriv alle felter UNDTAGEN Photos/Files i appendRow
-    const rowData = hdrs.map(col =>
-      LARGE_COLS.includes(col) ? '' : (data[col] !== undefined ? data[col] : '')
-    );
+    const rowData = hdrs.map(col => {
+      if (LARGE_COLS.includes(col)) return '';
+      const v = data[col] !== undefined ? data[col] : '';
+      return (typeof v === 'string' && v && /^[+=\-@]/.test(v)) ? ' ' + v : v;
+    });
     sheet.appendRow(rowData);
     // Skriv Photos/Files individuelt bagefter
     const nr = sheet.getLastRow();
@@ -72,7 +74,11 @@ function handleWrite(data) {
       if (LARGE_COLS.includes(col)) return ''; // placeholder — skrives individuelt nedenfor
       return data[col] !== undefined ? data[col] : (existing[i] !== undefined ? existing[i] : '');
     });
-    sheet.getRange(rowIdx + 1, 1, 1, hdrs.length).setValues([rowData]);
+    // Prefix strings starting with +/=/-/@ with a space to prevent formula interpretation
+    const safeRow = rowData.map(v =>
+      (typeof v === 'string' && v && /^[+=\-@]/.test(v)) ? ' ' + v : v
+    );
+    sheet.getRange(rowIdx + 1, 1, 1, hdrs.length).setValues([safeRow]);
     // Skriv Photos/Files individuelt — undgår at de store værdier crasher setValues
     writeLargeCols(sheet, rowIdx + 1, hdrs, data, existing);
   }

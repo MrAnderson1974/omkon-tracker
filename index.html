@@ -747,7 +747,7 @@ function fetchSheet() {
         if(priceOrQtyRestored){
           const qty=parseFloat(String(p.Qty||'').replace(/\./g,'').replace(',','.'))||0;
           const price=parseFloat(String(p.Price||'').replace(/\./g,'').replace(',','.'))||0;
-          if(qty&&price) p.Total=(qty*price).toLocaleString('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2});
+          if(qty&&price) p.Total=+(qty*price).toFixed(2);
         }
         // Fallback: localStorage backup for Extra fields (survives page reload)
         const lsKey='omkon_extra_'+p.PO;
@@ -1440,7 +1440,12 @@ function startEdit(el, cpo, field, type) {
     ta.addEventListener('keydown',e=>{if(e.key==='Escape')cancelEdit();});
   } else {
     const inp=document.createElement('input');
-    inp.className='edit-inp'; inp.type=type==='date'?'date':'text'; if(type==='number'){inp.inputMode='decimal';} inp.value=orig;
+    inp.className='edit-inp'; inp.type=type==='date'?'date':'text';
+    if(type==='number'){
+      inp.inputMode='decimal';
+      const n=parseFloat(orig);
+      inp.value=isNaN(n)?orig:n.toLocaleString('da-DK',{minimumFractionDigits:0,maximumFractionDigits:10});
+    } else { inp.value=orig; }
     el.innerHTML=''; el.appendChild(inp); inp.focus(); setTimeout(()=>inp.select(),0);
     inp.addEventListener('blur',()=>commitEdit(el,cpo,field,inp.value));
     inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape')cancelEdit();});
@@ -1456,7 +1461,8 @@ function commitEdit(el, cpo, field, value) {
   const p=findP(cpo); if(!p){renderAll();return;}
   let v=value;
   if(field==='Qty'||field==='Price'||field==='Total'||field==='Pct') v=normalizeDaNum(value);
-  if(p[field]===v){renderAll();return;}
+  if(['Qty','Price','Total','ExtraAmount'].includes(field)){const n=parseFloat(v);if(!isNaN(n))v=n;}
+  if(String(p[field])===String(v)){renderAll();return;}
   const prevUpdated=p.Updated; // capture BEFORE we change it — used for multi-user conflict detection
   p[field]=v; p.Updated=now(); p.UpdatedBy=ST.userName||ST.role;
   if((field==='Qty'||field==='Price')&&p.Qty&&p.Price) p.Total=+(parseFloat(p.Qty)*parseFloat(p.Price)).toFixed(2);
@@ -1501,7 +1507,7 @@ function submitCreate(e) {
   const q=parseFloat(g('qty'))||0, pr=parseFloat(g('price'))||0;
   const proj={
     PO:po, Name:g('name'), Responsible:g('responsible'), Email:g('email'), Phone:g('phone'),
-    KS_Tags:g('ks_tags'), Qty:g('qty'), Price:g('price'), Total:q&&pr?+(q*pr).toFixed(2):'',
+    KS_Tags:g('ks_tags'), Qty:q||'', Price:pr||'', Total:q&&pr?+(q*pr).toFixed(2):'',
     ExtraDesc:g('extra_desc'), ExtraAmount:g('extra_amount')||'', ExtraPaid:false,
     Pay1Paid:false, Pay2Paid:false, Pay3Paid:false,
     Pay1Date:g('pay1_date'), Pay2Date:g('pay2_date'), Pay3Date:'', ShippingDate:'',
