@@ -525,7 +525,7 @@ const LOGOS = {
   omkon:    { src:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMTAgODAiPjx0ZXh0IHg9IjAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI0ZGRkZGRiIgbGV0dGVyLXNwYWNpbmc9Ii0xIj5PTUtPTjwvdGV4dD48dGV4dCB4PSIyIiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC43KSIgbGV0dGVyLXNwYWNpbmc9IjQiPkludGVybmF0aW9uYWwgS2Z0PC90ZXh0Pjwvc3ZnPg==', alt:'OMKON', bg:'#1a1845', accent:'#7B76D0', accent2:'rgba(123,118,208,.15)', badge:'OMKON', sub:'Manufacturer · Production access' },
 };
 const SHEET_ID = '1ZwrdoIvV63lwGNqo-JiObDU1WnbMAlkPNh-HCmXwrdc';
-const GAS_URL  = 'https://script.google.com/macros/s/AKfycbzhlzf_x0qE4_Aqi9WesQVmzUe8_2lwqWOVn7Ny00W0dmrhvDcNqclchoiAc-gSKLNI/exec';
+const GAS_URL  = 'https://script.google.com/macros/s/AKfycbygaNJ8ZuuN3VkKB4T-VxFbtF1IQfOHIreizBK4VoqZPOkbC-4DtXegZyCBcD90Jtkw/exec';
 
 const ROLE_PINS = { cphsteel: '2025', omkon: '5678' };
 const CONFIGURED = SHEET_ID !== 'YOUR_SHEET_ID_HERE' && GAS_URL !== 'YOUR_GAS_URL_HERE';
@@ -724,17 +724,19 @@ function fetchSheet() {
         }
         // Restore any locally-edited fields — survives refresh before GAS lands.
         // Covers ALL field types: numeric, boolean, text, notes.
-        // If another user changed the row (Updated timestamp differs), discard stale entries.
+        // Strategy: if sheet already shows our saved value → GAS landed → clear entry.
+        // Otherwise keep localStorage until 5-min TTL expires.
+        // We do NOT use the Updated timestamp to detect conflicts — any write to the row
+        // updates Updated, including our own other edits, which was causing false discards.
         let priceOrQtyRestored = false;
         const editPrefix = 'omkon_edit_'+p.PO+'_';
         Object.keys(localStorage).filter(k=>k.startsWith(editPrefix)).forEach(k=>{
           const f = k.slice(editPrefix.length);
           const saved=JSON.parse(localStorage.getItem(k)||'null');
           if(!saved) return;
-          const otherUserEdited = saved.prevUpdated !== undefined && p.Updated && saved.prevUpdated !== p.Updated;
-          if(otherUserEdited) {
-            localStorage.removeItem(k);
-          } else if((Date.now()-saved.ts)<300000) {
+          // Sheet already has our value → GAS landed, clean up
+          if(p[f] !== undefined && String(p[f]) === String(saved.v)) { localStorage.removeItem(k); return; }
+          if((Date.now()-saved.ts)<300000) {
             p[f]=saved.v;
             if(f==='Price'||f==='Qty') priceOrQtyRestored=true;
           } else {
@@ -801,13 +803,13 @@ function postRow(proj) {
   delete payload.Files;
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
 }
-// Send only specific fields — Apps Script merge keeps all other Sheet values intact.
+// Send only specific fields — Apps Script writes only these cells, not the whole row.
 // Use this for every edit EXCEPT project creation, to avoid overwriting another user's fields.
 function postFields(cpo, fields) {
   if(!CONFIGURED)return;
   const p=findP(cpo); if(!p) return;
   _recentWrites[cpo]=Date.now();
-  const payload={PO:cpo, Updated:p.Updated, UpdatedBy:p.UpdatedBy};
+  const payload={PO:cpo, Updated:p.Updated, UpdatedBy:p.UpdatedBy, _partial:true};
   fields.forEach(f=>{ if(p[f]!==undefined) payload[f]=p[f]; });
   fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(e=>console.warn('Post failed:',e));
 }

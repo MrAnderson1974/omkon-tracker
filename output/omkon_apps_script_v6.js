@@ -70,6 +70,19 @@ function handleWrite(data) {
     sheet.appendRow(rowData);
     const nr = sheet.getLastRow();
     writeLargeCols(sheet, nr, hdrs, data, null);
+  } else if (data._partial) {
+    // Partial update — write only the fields explicitly in the payload.
+    // This prevents concurrent writes from overwriting fields not in this request.
+    const rowNum = rowIdx + 1;
+    Object.keys(data).forEach(col => {
+      if (col === 'PO' || col === '_partial' || LARGE_COLS.includes(col)) return;
+      const ci = hdrs.indexOf(col);
+      if (ci < 0) return;
+      let v = data[col];
+      if (typeof v === 'string' && v && /^[+=\-@]/.test(v)) v = ' ' + v;
+      sheet.getRange(rowNum, ci + 1).setValue(v);
+    });
+    writeLargeCols(sheet, rowNum, hdrs, data, all[rowIdx]);
   } else {
     const existing = all[rowIdx];
     const rowData = hdrs.map((col, i) => {
